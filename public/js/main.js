@@ -3,71 +3,76 @@ function CalendarControl() {
 	const calendarControl = {
 		localDate: new Date(),
 		prevMonthLastDate: null,
-		calWeekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+		calWeekDays: ['CN', 'Hai', 'Ba', 'Tư', 'Năm', 'Sáu', 'Bảy'],
+		calWeekDaysFull: ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'],
 		calMonthName: [
-			'Jan',
-			'Feb',
-			'Mar',
-			'Apr',
-			'May',
-			'Jun',
-			'Jul',
-			'Aug',
-			'Sep',
-			'Oct',
-			'Nov',
-			'Dec',
+			'Tháng 1',
+			'Tháng 2',
+			'Tháng 3',
+			'Tháng 4',
+			'Tháng 5',
+			'Tháng 6',
+			'Tháng 7',
+			'Tháng 8',
+			'Tháng 9',
+			'Tháng 10',
+			'Tháng 11',
+			'Tháng 12',
 		],
-		daysInMonth: function(month, year) {
+		daysInMonth(month, year) {
 			return new Date(year, month, 0).getDate();
 		},
-		firstDay: function() {
+		firstDay() {
 			return new Date(calendar.getFullYear(), calendar.getMonth(), 1);
 		},
-		lastDay: function() {
+		lastDay() {
 			return new Date(calendar.getFullYear(), calendar.getMonth() + 1, 0);
 		},
-		firstDayNumber: function() {
-			return calendarControl.firstDay().getDay() + 1;
+		firstDayColumn() {
+			// shift sunday to last column, monday is first day of week
+			const day = (calendarControl.firstDay().getDay() + 7 - 1) % 7;
+			return day + 1;
 		},
-		lastDayNumber: function() {
-			return calendarControl.lastDay().getDay() + 1;
+		lastDayColumn() {
+			// shift sunday to last column
+			const day = (calendarControl.lastDay().getDay() + 7 - 1) % 7;
+			return day + 1;
 		},
-		getPreviousMonthLastDate: function() {
+		getPreviousMonthLastDate() {
 			let lastDate = new Date(calendar.getFullYear(), calendar.getMonth(), 0).getDate();
 			return lastDate;
 		},
-		navigateToPreviousMonth: function() {
+		navigateToPreviousMonth() {
 			calendar.setMonth(calendar.getMonth() - 1);
 			calendarControl.attachEventsOnNextPrev();
 		},
-		navigateToNextMonth: function() {
+		navigateToNextMonth() {
 			calendar.setMonth(calendar.getMonth() + 1);
 			calendarControl.attachEventsOnNextPrev();
 		},
-		navigateToCurrentMonth: function() {
+		navigateToCurrentMonth() {
 			let currentMonth = calendarControl.localDate.getMonth();
 			let currentYear = calendarControl.localDate.getFullYear();
 			calendar.setMonth(currentMonth);
 			calendar.setYear(currentYear);
 			calendarControl.attachEventsOnNextPrev();
 		},
-		displayYear: function() {
+		displayYear() {
 			let yearLabel = document.querySelector('.calendar .calendar-year-label');
 			yearLabel.innerHTML = calendar.getFullYear();
 		},
-		displayMonth: function() {
+		displayMonth() {
 			let monthLabel = document.querySelector('.calendar .calendar-month-label');
 			monthLabel.innerHTML = calendarControl.calMonthName[calendar.getMonth()];
 		},
-		selectDate: function(e) {
+		selectDate(e) {
 			console.log(
 				`${e.target.textContent} ${calendarControl.calMonthName[calendar.getMonth()]
 				} ${calendar.getFullYear()}`
 			);
 		},
-		plotSelectors: function() {
-			document.querySelector('.calendar').innerHTML +=
+		plotSelectors() {
+			document.querySelector('.calendar').innerHTML =
 				`<div class="calendar-inner"><div class="calendar-controls">
           <div class="calendar-prev"><a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><path fill="#666" d="M88.2 3.8L35.8 56.23 28 64l7.8 7.78 52.4 52.4 9.78-7.76L45.58 64l52.4-52.4z"/></svg></a></div>
           <div class="calendar-year-month">
@@ -77,22 +82,28 @@ function CalendarControl() {
           </div>
           <div class="calendar-next"><a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><path fill="#666" d="M38.8 124.2l52.4-52.42L99 64l-7.77-7.78-52.4-52.4-9.8 7.77L81.44 64 29 116.42z"/></svg></a></div>
           </div>
-          <div class="calendar-today-date">Today: 
-            ${calendarControl.calWeekDays[calendarControl.localDate.getDay()]}, 
-            ${calendarControl.localDate.getDate()}, 
+          <div class="calendar-today-date">Hôm nay: 
+            ${calendarControl.calWeekDaysFull[calendarControl.localDate.getDay()]}, 
+            ${calendarControl.localDate.getDate()} 
             ${calendarControl.calMonthName[calendarControl.localDate.getMonth()]} 
             ${calendarControl.localDate.getFullYear()}
           </div>
-          <div class="calendar-body"></div></div>`;
+          
+					<div class="calendar-body">
+						<div class="calendar-weekdays"></div>
+						<div class="calendar-dates"></div>
+					</div></div>`;
 		},
-		plotDayNames: function() {
-			for (let i = 0; i < calendarControl.calWeekDays.length; i++) {
-				document.querySelector('.calendar .calendar-body').innerHTML +=
-					`<div>${calendarControl.calWeekDays[i]}</div>`;
+		plotDayNames() {
+			var html = '';
+			for (let i = 0; i < 7; i++) {
+				// shift sunday to last column
+				html += `<div>${calendarControl.calWeekDays[(i + 1 + 7) % 7]}</div>`;
 			}
+			document.querySelector('.calendar .calendar-weekdays').innerHTML = html;
 		},
-		plotDates: function() {
-			document.querySelector('.calendar .calendar-body').innerHTML = '';
+		plotDates() {
+			document.querySelector('.calendar .calendar-dates').innerHTML = '';
 			calendarControl.plotDayNames();
 			calendarControl.displayMonth();
 			calendarControl.displayYear();
@@ -105,28 +116,49 @@ function CalendarControl() {
 				calendar.getMonth() + 1,
 				calendar.getFullYear()
 			);
+			let html = '';
 			// dates of current month
 			for (let i = 1; i < calendarDays; i++) {
-				if (i < calendarControl.firstDayNumber()) {
+				if (i < calendarControl.firstDayColumn()) {
 					prevDateCount += 1;
-					document.querySelector('.calendar .calendar-body').innerHTML +=
-						`<div class="prev-dates"></div>`;
+					html += `<div class="prev-dates"></div>`;
 					prevMonthDatesArray.push(calendarControl.prevMonthLastDate--);
 				} else {
-					document.querySelector('.calendar .calendar-body').innerHTML +=
-						`<div class="number-item" data-num=${count}><a class="dateNumber" href="#">${count++}</a></div>`;
+					const lunarDateStr = calendarControl.lunarDateCell(
+						count,
+						calendar.getMonth() + 1,
+						calendar.getFullYear(),
+						7
+					);
+					html += `<div class="number-item" data-num=${count}><a class="dateNumber" href="#">${count++}</a>
+	${lunarDateStr}</div>`;
 				}
 			}
 			//remaining dates after month dates
 			for (let j = 0; j < prevDateCount + 1; j++) {
-				document.querySelector('.calendar .calendar-body').innerHTML +=
-					`<div class="number-item" data-num=${count}><a class="dateNumber" href="#">${count++}</a></div>`;
+				const lunarDateStr = calendarControl.lunarDateCell(
+					count,
+					calendar.getMonth() + 1,
+					calendar.getFullYear(),
+					7
+				);
+				html += `<div class="number-item" data-num=${count}><a class="dateNumber" href="#">${count++}</a>${lunarDateStr}</div>`;
 			}
+			document.querySelector('.calendar .calendar-dates').innerHTML += html;
 			calendarControl.highlightToday();
 			calendarControl.plotPrevMonthDates(prevMonthDatesArray);
 			calendarControl.plotNextMonthDates();
 		},
-		attachEvents: function() {
+		lunarDateCell(d, m, y, timeZone) {
+			// am lich
+			let lunarDate = convertSolar2Lunar(d, m, y, timeZone);
+			const lunarDateStr =
+				lunarDate[0] === 1
+					? `<span class="lunar-date">${lunarDate[0]}/${lunarDate[1]}</span>`
+					: `<span class="lunar-date">${lunarDate[0]}</span>`;
+			return lunarDateStr;
+		},
+		attachEvents() {
 			let prevBtn = document.querySelector('.calendar .calendar-prev a');
 			let nextBtn = document.querySelector('.calendar .calendar-next a');
 			let todayDate = document.querySelector('.calendar .calendar-today-date');
@@ -138,7 +170,7 @@ function CalendarControl() {
 				dateNumber[i].addEventListener('click', calendarControl.selectDate, false);
 			}
 		},
-		highlightToday: function() {
+		highlightToday() {
 			let currentMonth = calendarControl.localDate.getMonth() + 1;
 			let changedMonth = calendar.getMonth() + 1;
 			let currentYear = calendarControl.localDate.getFullYear();
@@ -153,41 +185,55 @@ function CalendarControl() {
 				[calendar.getDate() - 1].classList.add('calendar-today');
 			}
 		},
-		plotPrevMonthDates: function(dates) {
+		plotPrevMonthDates(dates) {
 			dates.reverse();
+			let prevMonthDate = new Date(calendar.getFullYear(), calendar.getMonth() - 1, 1);
 			for (let i = 0; i < dates.length; i++) {
 				if (document.querySelectorAll('.prev-dates')) {
-					document.querySelectorAll('.prev-dates')[i].textContent = dates[i];
+					let lunarDateStr = calendarControl.lunarDateCell(
+						dates[i],
+						prevMonthDate.getMonth() + 1,
+						prevMonthDate.getFullYear(),
+						7
+					);
+					document.querySelectorAll('.prev-dates')[i].innerHTML =
+						`<div>${dates[i]}</div>${lunarDateStr}`;
 				}
 			}
 		},
-		plotNextMonthDates: function() {
-			let childElemCount = document.querySelector('.calendar-body').childElementCount;
+		plotNextMonthDates() {
+			let childElemCount = document.querySelector('.calendar-dates').childElementCount;
 			//7 lines
-			if (childElemCount > 42) {
-				let diff = 49 - childElemCount;
-				calendarControl.loopThroughNextDays(diff);
+			if (childElemCount > 35) {
+				calendarControl.loopThroughNextDays(42 - childElemCount);
 			}
 
 			//6 lines
-			if (childElemCount > 35 && childElemCount <= 42) {
-				let diff = 42 - childElemCount;
-				calendarControl.loopThroughNextDays(42 - childElemCount);
+			if (childElemCount > 28 && childElemCount <= 35) {
+				calendarControl.loopThroughNextDays(35 - childElemCount);
 			}
 		},
-		loopThroughNextDays: function(count) {
+		loopThroughNextDays(count) {
 			if (count > 0) {
+				let html = '';
+				let nextMonthDate = new Date(calendar.getFullYear(), calendar.getMonth() + 1, 1);
 				for (let i = 1; i <= count; i++) {
-					document.querySelector('.calendar-body').innerHTML +=
-						`<div class="next-dates">${i}</div>`;
+					let lunarDateStr = calendarControl.lunarDateCell(
+						i,
+						nextMonthDate.getMonth() + 1,
+						nextMonthDate.getFullYear(),
+						7
+					);
+					html += `<div class="next-dates"><div>${i}</div>${lunarDateStr}</div>`;
 				}
+				document.querySelector('.calendar-dates').innerHTML += html;
 			}
 		},
-		attachEventsOnNextPrev: function() {
+		attachEventsOnNextPrev() {
 			calendarControl.plotDates();
 			calendarControl.attachEvents();
 		},
-		init: function() {
+		init() {
 			calendarControl.plotSelectors();
 			calendarControl.plotDates();
 			calendarControl.attachEvents();
