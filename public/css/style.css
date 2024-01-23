@@ -169,3 +169,35 @@ body {
 .calendar-body .next-dates .lunar-date {
 	color: var(--calendar-prevnext-date-color);
 }
+
+.calendar-details {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-rows: auto;
+	gap: 0px 0px;
+	grid-template-areas:
+		'. solar .'
+		'date . names'
+		'hours hours hours';
+	font-size: 14px;
+}
+
+.calendar-details .solar-current {
+	grid-area: solar;
+	text-align: center;
+	padding: 10px 0px;
+}
+
+.calendar-details .lunar-current {
+	grid-area: date;
+	text-align: center;
+}
+
+.calendar-details .lunar-names {
+	grid-area: names;
+}
+
+.calendar-details .lunar-hours {
+	grid-area: hours;
+	padding: 10px 0px;
+}

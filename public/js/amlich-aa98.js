@@ -6,7 +6,7 @@
  * documentation for personal, non-commercial use is hereby granted provided that
  * this copyright notice and appropriate documentation appears in all copies.
  */
-var PI = Math.PI;
+const PI = Math.PI;
 
 /* Discard the fractional part of a number, e.g., INT(3.2) = 3 */
 function INT(d) {
@@ -217,4 +217,129 @@ function convertLunar2Solar(lunarDay, lunarMonth, lunarYear, lunarLeap, timeZone
 	}
 	monthStart = getNewMoonDay(k + off, timeZone);
 	return jdToDate(monthStart + lunarDay - 1);
+}
+
+// ---------------------------------------------------
+/* prettier-ignore */
+const TUAN = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+/* prettier-ignore */
+const THANG = ["Giêng", "Hai", "Ba", "Tư", "Năm", "Sáu", "Bảy", "Tám", "Chín", "Mười", "Một", "Chạp"];
+/* prettier-ignore */
+const CAN = ["Giáp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ", "Canh", "Tân", "Nhâm", "Quý"];
+/* prettier-ignore */
+const CHI = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
+/* prettier-ignore */
+const GIO_HD = ["110100101100", "001101001011", "110011010010", "101100110100", "001011001101", "010010110011"];
+/* prettier-ignore */
+const TIETKHI = ["Xuân phân", "Thanh minh", "Cốc vũ", "Lập hạ", "Tiểu mãn", "Mang chủng",
+	"Hạ chí", "Tiểu thử", "Đại thử", "Lập thu", "Xử thử", "Bạch lộ",
+	"Thu phân", "Hàn lộ", "Sương giáng", "Lập đông", "Tiểu tuyết", "Đại tuyết",
+	"Đông chí", "Tiểu hàn", "Đại hàn", "Lập xuân", "Vũ Thủy", "Kinh trập"];
+
+function YearlyEvent(dd, mm, info) {
+	this.day = dd;
+	this.month = mm;
+	this.info = info;
+}
+
+const YEARLY_EVENTS = new Array(
+	new YearlyEvent(1, 1, 'Tết Nguyên Đán'),
+	new YearlyEvent(15, 1, 'Rằm tháng Giêng'),
+	new YearlyEvent(10, 3, 'Giỗ Tổ Hùng Vương (10/3 ÂL)'),
+	new YearlyEvent(15, 4, 'Phật Đản (15/4 ÂL)'),
+	new YearlyEvent(5, 5, 'Lễ Đoan Ngọ (5/5 ÂL)'),
+	new YearlyEvent(15, 7, 'Vu Lan (15/7 ÂL)'),
+	new YearlyEvent(15, 8, 'Tết Trung Thu (Rằm tháng 8)'),
+	new YearlyEvent(23, 12, 'Ông Táo chầu trời (23/12 ÂL)')
+);
+
+function findEvents(dd, mm) {
+	var ret = [];
+	for (var i = 0; i < YEARLY_EVENTS.length; i++) {
+		evt = YEARLY_EVENTS[i];
+		if (evt.day == dd && evt.month == mm) {
+			ret.push(evt);
+		}
+	}
+	return ret;
+}
+
+function getDayInfo(dd, mm) {
+	var events = findEvents(dd, mm);
+	var ret = '';
+	for (var i = 0; i < events.length; i++) {
+		ret += events[i].info + ' ';
+	}
+	ret += '&nbsp;';
+	return ret;
+}
+
+// TODO: remove
+function showDayInfo(cellId, dd, mm, yy, leap, length, jd, sday, smonth, syear) {
+	selectCell(cellId);
+	//alert('Cell '+cellId+': '+dd+'/'+mm+'/'+yy+" AL = "+sday+"/"+smonth+"/"+syear);
+	document.NaviForm.dd.value = sday;
+	//document.getElementById("thangduong").innerHTML = 'Tháng '+smonth+' năm '+syear;
+	document.getElementById('ngayduong').innerHTML = sday;
+	var dayOfWeek = TUAN[(jd + 1) % 7];
+	document.getElementById('thuduong').innerHTML = dayOfWeek;
+	document.getElementById('ngayam').innerHTML = dd;
+	var nhuan = leap == 1 ? ' nhu\u1EADn' : '';
+	var tenthang = 'Th\u00E1ng ' + THANG[mm - 1] + nhuan + (length == 30 ? ' (\u0110)' : ' (T)');
+	document.getElementById('thangam').innerHTML = tenthang;
+	document.getElementById('namam').innerHTML = 'N\u0103m ' + getYearCanChi(yy);
+	var thang = CAN[(yy * 12 + mm + 3) % 10] + ' ' + CHI[(mm + 1) % 12];
+	document.getElementById('canchithang').innerHTML = 'Th\u00E1ng ' + thang;
+	var ngay = CAN[(jd + 9) % 10] + ' ' + CHI[(jd + 1) % 12];
+	document.getElementById('canchingay').innerHTML = 'Ng\u00E0y ' + ngay;
+	document.getElementById('canchigio').innerHTML = 'Gi\u1EDD ' + getCanHour0(jd) + ' ' + CHI[0];
+	document.getElementById('tietkhi').innerHTML = 'Ti\u1EBFt ' + TIETKHI[getSolarTerm(jd + 1, 7.0)];
+	document.getElementById('dayinfo').innerHTML = getDayInfo(dd, mm);
+	document.getElementById('hoangdao').innerHTML =
+		'Gi\u1EDD ho\u00E0ng \u0111\u1EA1o: ' + getGioHoangDao(jd);
+	//document.NaviForm.submit();
+}
+// TODO: remove
+function selectCell(cellId) {
+	for (var i = 0; i < 42; i++) {
+		document.getElementById('cell' + i).className = 'ngaythang';
+	}
+	document.getElementById('cell' + cellId).className = 'homnay';
+}
+
+function getYearCanChi(year) {
+	return CAN[(year + 6) % 10] + ' ' + CHI[(year + 8) % 12];
+}
+
+/*
+ * Can cua gio Chinh Ty (00:00) cua ngay voi JDN nay
+ */
+function getCanHour0(jdn) {
+	return CAN[((jdn - 1) * 2) % 10];
+}
+
+function getGioHoangDao(jd) {
+	var chiOfDay = (jd + 1) % 12;
+	var gioHD = GIO_HD[chiOfDay % 6]; // same values for Ty' (1) and Ngo. (6), for Suu and Mui etc.
+	var ret = '';
+	var count = 0;
+	for (var i = 0; i < 12; i++) {
+		if (gioHD.charAt(i) == '1') {
+			ret += CHI[i];
+			ret += ' (' + ((i * 2 + 23) % 24) + '-' + ((i * 2 + 1) % 24) + ')';
+			if (count++ < 5) ret += ', ';
+			//if (count == 3) ret += '\n';
+		}
+	}
+	return ret;
+}
+
+/* Compute the sun segment at start (00:00) of the day with the given integral Julian day number.
+ * The time zone if the time difference between local time and UTC: 7.0 for UTC+7:00.
+ * The function returns a number between 0 and 23.
+ * From the day after March equinox and the 1st major term after March equinox, 0 is returned.
+ * After that, return 1, 2, 3 ...
+ */
+function getSolarTerm(dayNumber, timeZone) {
+	return INT((SunLongitude(dayNumber - 0.5 - timeZone / 24.0) / PI) * 12);
 }
