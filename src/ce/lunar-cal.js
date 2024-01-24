@@ -289,12 +289,24 @@ class LunarSolarCalendar extends HTMLElement {
 			return new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 0);
 		}
 		function navigateToPreviousMonth() {
+			const startMonth = selectedDate.getMonth();
 			selectedDate.setMonth(selectedDate.getMonth() - 1);
+			if (selectedDate.getMonth() == startMonth) {
+				// if month not changed, it means startMonth date exceed previous month total days
+				selectedDate.setDate(0); // set to last day of previous month
+			}
 			plotDates();
+			selectDate();
 		}
 		function navigateToNextMonth() {
+			const startMonth = selectedDate.getMonth();
 			selectedDate.setMonth(selectedDate.getMonth() + 1);
+			if (selectedDate.getMonth() > startMonth + 1) {
+				// if it jump 2 months forward (due to last day exceed next month total days)
+				selectedDate.setDate(0); // set to last day of previous month
+			}
 			plotDates();
+			selectDate();
 		}
 		function navigateToCurrentMonth() {
 			let currentMonth = localDate.getMonth();
@@ -312,24 +324,25 @@ class LunarSolarCalendar extends HTMLElement {
 			let monthLabel = wrapper.querySelector('.calendar-month-label');
 			monthLabel.innerHTML = calMonthName[selectedDate.getMonth()];
 		}
-		function selectDate(e) {
+		function handleDateClick(e) {
 			e.preventDefault();
-			// clear selection
-			Array.from(wrapper.querySelectorAll('.date-number')).forEach((elem) => {
-				elem.classList.remove('selected');
-			});
 			const elem = e.target.closest('.date-number');
 			const dateNum = elem ? elem.dataset.num : '';
-			if (dateNum) {
-				console.log(
-					`${e.target.textContent} ${calMonthName[selectedDate.getMonth()]
-					} ${selectedDate.getFullYear()}`
-				);
+			if (!dateNum) return;
+			selectDate(dateNum);
+		}
 
-				e.target.closest('.date-number').classList.add('selected');
-				selectedDate.setDate(dateNum);
-				displayDate();
-			}
+		function selectDate(dateNum) {
+			if (dateNum) selectedDate.setDate(dateNum);
+			else dateNum = selectedDate.getDate();
+			Array.from(wrapper.querySelectorAll('.date-number')).forEach((elem) => {
+				if (elem.dataset.num == dateNum) {
+					elem.classList.add('selected');
+					return;
+				}
+				elem.classList.remove('selected');
+			});
+			displayDateInfo();
 		}
 		// prettier-ignore
 		this.html = () => html`<div class="calendar-inner">
@@ -441,25 +454,21 @@ class LunarSolarCalendar extends HTMLElement {
 			prevBtn.addEventListener('click', navigateToPreviousMonth);
 			nextBtn.addEventListener('click', navigateToNextMonth);
 			todayDate.addEventListener('click', navigateToCurrentMonth);
-			dateNumberParent.addEventListener('click', selectDate);
+			dateNumberParent.addEventListener('click', handleDateClick);
 		}
 		function highlightToday() {
 			let currentMonth = localDate.getMonth() + 1;
 			let changedMonth = selectedDate.getMonth() + 1;
 			let currentYear = localDate.getFullYear();
 			let changedYear = selectedDate.getFullYear();
-			if (
-				currentYear === changedYear &&
-				currentMonth === changedMonth &&
-				wrapper.querySelectorAll('.date-number')
-			) {
+			if (currentYear === changedYear && currentMonth === changedMonth) {
 				wrapper
 					.querySelectorAll('.date-number')
-				[selectedDate.getDate() - 1].classList.add('calendar-today');
-				displayDate();
+				[localDate.getDate() - 1].classList.add('calendar-today');
+				selectDate();
 			}
 		}
-		function displayDate() {
+		function displayDateInfo() {
 			const lunarDayInfo = getLunarDayInfo(selectedDate, 7);
 			wrapper.querySelector('.solar-current .solar-date').textContent = selectedDate.getDate();
 			wrapper.querySelector('.solar-current .solar-day').textContent =
