@@ -148,6 +148,9 @@ function getLeapMonthOffset(a11, timeZone) {
 }
 
 /* Comvert solar date dd/mm/yyyy to the corresponding lunar date */
+/**
+ * @return {[lunarDay: number, lunarMonth: number, lunarYear: number, lunarLeap: 0 | 1, julianDay: number]} lunar date
+ */
 function convertSolar2Lunar(dd, mm, yy, timeZone) {
 	var k, dayNumber, monthStart, a11, b11, lunarDay, lunarMonth, lunarYear, lunarLeap;
 	dayNumber = jdFromDate(dd, mm, yy);
@@ -167,11 +170,11 @@ function convertSolar2Lunar(dd, mm, yy, timeZone) {
 		b11 = getLunarMonth11(yy + 1, timeZone);
 	}
 	lunarDay = dayNumber - monthStart + 1;
-	diff = INT((monthStart - a11) / 29);
+	var diff = INT((monthStart - a11) / 29);
 	lunarLeap = 0;
 	lunarMonth = diff + 11;
 	if (b11 - a11 > 365) {
-		leapMonthDiff = getLeapMonthOffset(a11, timeZone);
+		var leapMonthDiff = getLeapMonthOffset(a11, timeZone);
 		if (diff >= leapMonthDiff) {
 			lunarMonth = diff + 10;
 			if (diff == leapMonthDiff) {
@@ -185,7 +188,7 @@ function convertSolar2Lunar(dd, mm, yy, timeZone) {
 	if (lunarMonth >= 11 && diff < 4) {
 		lunarYear -= 1;
 	}
-	return new Array(lunarDay, lunarMonth, lunarYear, lunarLeap);
+	return [lunarDay, lunarMonth, lunarYear, lunarLeap, dayNumber];
 }
 
 /* Convert a lunar date to the corresponding solar date */
@@ -223,7 +226,7 @@ function convertLunar2Solar(lunarDay, lunarMonth, lunarYear, lunarLeap, timeZone
 /* prettier-ignore */
 const TUAN = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
 /* prettier-ignore */
-const THANG = ["Giêng", "Hai", "Ba", "Tư", "Năm", "Sáu", "Bảy", "Tám", "Chín", "Mười", "Một", "Chạp"];
+const THANG = ["Giêng", "Hai", "Ba", "Tư", "Năm", "Sáu", "Bảy", "Tám", "Chín", "Mười", "Mười Một", "Chạp"];
 /* prettier-ignore */
 const CAN = ["Giáp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ", "Canh", "Tân", "Nhâm", "Quý"];
 /* prettier-ignore */
@@ -253,10 +256,15 @@ const YEARLY_EVENTS = new Array(
 	new YearlyEvent(23, 12, 'Ông Táo chầu trời (23/12 ÂL)')
 );
 
+/**
+ * @param {number} dd Lunar date
+ * @param {number} mm Lunar month
+ * @return {Array<YearlyEvent>} Yearly events on the given date
+ */
 function findEvents(dd, mm) {
-	var ret = [];
+	const ret = [];
 	for (var i = 0; i < YEARLY_EVENTS.length; i++) {
-		evt = YEARLY_EVENTS[i];
+		const evt = YEARLY_EVENTS[i];
 		if (evt.day == dd && evt.month == mm) {
 			ret.push(evt);
 		}
@@ -264,47 +272,56 @@ function findEvents(dd, mm) {
 	return ret;
 }
 
-function getDayInfo(dd, mm) {
-	var events = findEvents(dd, mm);
-	var ret = '';
-	for (var i = 0; i < events.length; i++) {
+function getEventInfo(dd, mm) {
+	const events = findEvents(dd, mm);
+	let ret = '';
+	for (let i = 0; i < events.length; i++) {
 		ret += events[i].info + ' ';
 	}
-	ret += '&nbsp;';
 	return ret;
 }
 
-// TODO: remove
-function showDayInfo(cellId, dd, mm, yy, leap, length, jd, sday, smonth, syear) {
-	selectCell(cellId);
-	//alert('Cell '+cellId+': '+dd+'/'+mm+'/'+yy+" AL = "+sday+"/"+smonth+"/"+syear);
-	document.NaviForm.dd.value = sday;
-	//document.getElementById("thangduong").innerHTML = 'Tháng '+smonth+' năm '+syear;
-	document.getElementById('ngayduong').innerHTML = sday;
-	var dayOfWeek = TUAN[(jd + 1) % 7];
-	document.getElementById('thuduong').innerHTML = dayOfWeek;
-	document.getElementById('ngayam').innerHTML = dd;
-	var nhuan = leap == 1 ? ' nhu\u1EADn' : '';
-	var tenthang = 'Th\u00E1ng ' + THANG[mm - 1] + nhuan + (length == 30 ? ' (\u0110)' : ' (T)');
-	document.getElementById('thangam').innerHTML = tenthang;
-	document.getElementById('namam').innerHTML = 'N\u0103m ' + getYearCanChi(yy);
-	var thang = CAN[(yy * 12 + mm + 3) % 10] + ' ' + CHI[(mm + 1) % 12];
-	document.getElementById('canchithang').innerHTML = 'Th\u00E1ng ' + thang;
-	var ngay = CAN[(jd + 9) % 10] + ' ' + CHI[(jd + 1) % 12];
-	document.getElementById('canchingay').innerHTML = 'Ng\u00E0y ' + ngay;
-	document.getElementById('canchigio').innerHTML = 'Gi\u1EDD ' + getCanHour0(jd) + ' ' + CHI[0];
-	document.getElementById('tietkhi').innerHTML = 'Ti\u1EBFt ' + TIETKHI[getSolarTerm(jd + 1, 7.0)];
-	document.getElementById('dayinfo').innerHTML = getDayInfo(dd, mm);
-	document.getElementById('hoangdao').innerHTML =
-		'Gi\u1EDD ho\u00E0ng \u0111\u1EA1o: ' + getGioHoangDao(jd);
-	//document.NaviForm.submit();
-}
-// TODO: remove
-function selectCell(cellId) {
-	for (var i = 0; i < 42; i++) {
-		document.getElementById('cell' + i).className = 'ngaythang';
-	}
-	document.getElementById('cell' + cellId).className = 'homnay';
+/**
+ * @param {Date} solarDate
+ * @param {number} timeZone
+ * @return {{
+ *   date: number,
+ *   month: number,
+ *   monthName: string,
+ *   year: string,
+ *   ccmonth: string,
+ *   ccdate: string,
+ *   cchour: string,
+ *   tietkhi: string,
+ *   lunarEvent: string,
+ *   hoangdao: string
+ * }} Lunar day info
+ */
+function getLunarDayInfo(solarDate, timeZone) {
+	const lunarDay = convertSolar2Lunar(
+		solarDate.getDate(),
+		solarDate.getMonth() + 1,
+		solarDate.getFullYear(),
+		timeZone
+	);
+	const [dd, mm, yy, leap, jd] = lunarDay;
+
+	const nhuan = leap == 1 ? ' nhuận' : '';
+	// TODO: re-implement Du / Thieu in month
+	// const monthName = 'Tháng ' + THANG[mm - 1] + nhuan + (length == 30 ? ' (Đ)' : ' (T)');
+	const monthName = 'Tháng ' + THANG[mm - 1] + nhuan;
+	return {
+		date: dd,
+		month: mm,
+		monthName,
+		year: getYearCanChi(yy),
+		ccmonth: CAN[(yy * 12 + mm + 3) % 10] + ' ' + CHI[(mm + 1) % 12],
+		ccdate: CAN[(jd + 9) % 10] + ' ' + CHI[(jd + 1) % 12],
+		cchour: getCanHour0(jd) + ' ' + CHI[0],
+		tietkhi: TIETKHI[getSolarTerm(jd + 1, timeZone)],
+		lunarEvent: getEventInfo(dd, mm),
+		hoangdao: getGioHoangDao(jd),
+	};
 }
 
 function getYearCanChi(year) {
@@ -326,7 +343,7 @@ function getGioHoangDao(jd) {
 	for (var i = 0; i < 12; i++) {
 		if (gioHD.charAt(i) == '1') {
 			ret += CHI[i];
-			ret += ' (' + ((i * 2 + 23) % 24) + '-' + ((i * 2 + 1) % 24) + ')';
+			ret += '&nbsp;(' + ((i * 2 + 23) % 24) + '-' + ((i * 2 + 1) % 24) + ')';
 			if (count++ < 5) ret += ', ';
 			//if (count == 3) ret += '\n';
 		}
@@ -343,3 +360,30 @@ function getGioHoangDao(jd) {
 function getSolarTerm(dayNumber, timeZone) {
 	return INT((SunLongitude(dayNumber - 0.5 - timeZone / 24.0) / PI) * 12);
 }
+
+export {
+	// NewMoon,
+	// SunLongitude,
+	// getCanHour0,
+	// getEventInfo,
+	// getGioHoangDao,
+	// getLeapMonthOffset,
+	// getLunarMonth11,
+	// getNewMoonDay,
+	// getSolarTerm,
+	// getSunLongitude,
+	// getYearCanChi,
+	// jdFromDate,
+	// jdToDate,
+	CAN,
+	CHI,
+	GIO_HD,
+	THANG,
+	TIETKHI,
+	TUAN,
+	YEARLY_EVENTS,
+	convertLunar2Solar,
+	convertSolar2Lunar,
+	findEvents,
+	getLunarDayInfo,
+};
