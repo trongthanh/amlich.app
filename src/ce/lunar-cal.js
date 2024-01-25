@@ -1,10 +1,10 @@
 // TODO: remove plain-tag
-import css from 'plain-tag';
-import html from 'plain-tag';
+// import css from 'plain-tag';
+// import html from 'plain-tag';
 
 import { convertSolar2Lunar, getLunarDayInfo, findEvents } from '../lib/amlich.js';
 
-const styles = css`
+const styles = `
   :host {
     font-size: 16px;
 
@@ -54,15 +54,7 @@ const styles = css`
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     text-align: center;
-  }
-
-  .calendar-weekdays > div,
-  .calendar-dates > a {
-    padding: 4px;
-    /* min-height: 30px; */
     line-height: 1.3;
-    border: 1px solid transparent;
-    margin: 4px 2px;
   }
 
   .calendar-weekdays > div {
@@ -88,6 +80,7 @@ const styles = css`
     display: flex;
     flex-direction: column;
     justify-content: center;
+    margin: 2px;
   }
 
   .date-number:hover {
@@ -123,10 +116,18 @@ const styles = css`
     background: var(--calendar-current-date-color);
     padding: 8px 0px;
     border-radius: 10px;
-    border: none;
+    border: 1px solid var(--calendar-current-date-color);
     color: var(--calendar-font-color);
     width: 80%;
     margin: 8px auto;
+  }
+
+  .calendar-today-date:hover {
+    border: 1px solid var(--calendar-date-hover-color);
+  }
+
+  .calendar-today-date:active {
+    background: var(--calendar-active-bg-color);
   }
 
   .calendar-controls .calendar-year-month {
@@ -160,12 +161,11 @@ const styles = css`
     font-family: arial, consolas, sans-serif;
     font-size: 26px;
     text-decoration: none;
-    padding: 4px 12px;
+    padding: 8px 12px;
     display: inline-block;
     background: var(--calendar-nextprev-bg-color);
     border: 1px solid transparent;
     cursor: pointer;
-    margin: 10px 0 10px 0;
   }
   .calendar-controls button:hover {
     border: 1px solid var(--calendar-date-hover-color);
@@ -192,7 +192,6 @@ const styles = css`
   .calendar-body .prev-dates:hover,
   .calendar-body .next-dates:hover {
     border: 1px solid transparent;
-    pointer-events: none;
   }
 
   .calendar-body .lunar-date {
@@ -212,25 +211,53 @@ const styles = css`
     gap: 0px 0px;
     grid-template-areas:
       '. solar .'
-      'date . names'
+      'left lunar right'
       'hours hours hours'
       'event event event';
     font-size: 14px;
   }
 
-  .calendar-details .solar-current {
+  .calendar-details .solar {
     grid-area: solar;
     text-align: center;
-    padding: 10px 0px;
+    padding: 0px;
   }
 
-  .calendar-details .lunar-current {
-    grid-area: date;
+  .calendar-details .solar-date {
+    font-size: 56px;
+    line-height: 1;
+    padding: 4px 0 12px 0;
+  }
+
+  .calendar-details .solar-day {
+    font-size: 18px;
+  }
+
+  .calendar-details .lunar {
+    grid-area: lunar;
     text-align: center;
   }
+  .calendar-details .lunar-year {
+    font-size: 14px;
+  }
+  .calendar-details .lunar-month {
+    color: var(--lunar-date-color);
+  }
 
-  .calendar-details .lunar-names {
-    grid-area: names;
+  .calendar-details .lunar-date {
+    font-size: 32px;
+    color: var(--lunar-date-color);
+    padding: 8px 0px;
+  }
+
+  .calendar-details .info-left {
+    grid-area: left;
+    font-size: 12px;
+  }
+  .calendar-details .info-right {
+    grid-area: right;
+    font-size: 12px;
+    text-align: right;
   }
 
   .calendar-details .lunar-hours {
@@ -288,9 +315,10 @@ class LunarSolarCalendar extends HTMLElement {
 		function getPreviousMonthLastDate() {
 			return new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 0);
 		}
-		function navigateToPreviousMonth() {
+		function navigateToPreviousMonth(dateNum) {
 			const startMonth = selectedDate.getMonth();
 			selectedDate.setMonth(selectedDate.getMonth() - 1);
+			if (dateNum) selectedDate.setDate(dateNum);
 			if (selectedDate.getMonth() == startMonth) {
 				// if month not changed, it means startMonth date exceed previous month total days
 				selectedDate.setDate(0); // set to last day of previous month
@@ -298,9 +326,10 @@ class LunarSolarCalendar extends HTMLElement {
 			plotDates();
 			selectDate();
 		}
-		function navigateToNextMonth() {
+		function navigateToNextMonth(dateNum) {
 			const startMonth = selectedDate.getMonth();
 			selectedDate.setMonth(selectedDate.getMonth() + 1);
+			if (dateNum) selectedDate.setDate(dateNum);
 			if (selectedDate.getMonth() > startMonth + 1) {
 				// if it jump 2 months forward (due to last day exceed next month total days)
 				selectedDate.setDate(0); // set to last day of previous month
@@ -327,9 +356,20 @@ class LunarSolarCalendar extends HTMLElement {
 		function handleDateClick(e) {
 			e.preventDefault();
 			const elem = e.target.closest('.date-number');
-			const dateNum = elem ? elem.dataset.num : '';
-			if (!dateNum) return;
-			selectDate(dateNum);
+			if (elem) {
+				// click on current month date
+				const dateNum = elem.dataset.num;
+				if (!dateNum) return;
+				selectDate(dateNum);
+			}
+			const nextBtn = e.target.closest('.next-dates');
+			if (nextBtn) {
+				navigateToNextMonth(nextBtn.dataset.num);
+			}
+			const prevBtn = e.target.closest('.prev-dates');
+			if (prevBtn) {
+				navigateToPreviousMonth(prevBtn.dataset.num);
+			}
 		}
 
 		function selectDate(dateNum) {
@@ -345,7 +385,7 @@ class LunarSolarCalendar extends HTMLElement {
 			displayDateInfo();
 		}
 		// prettier-ignore
-		this.html = () => html`<div class="calendar-inner">
+		this.html = () => `<div class="calendar-inner">
 	<div class="calendar-controls">
 		<div class="calendar-prev"><button type="button"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><path fill="#666" d="M88.2 3.8L35.8 56.23 28 64l7.8 7.78 52.4 52.4 9.78-7.76L45.58 64l52.4-52.4z"/></svg></button></div>
 		<div class="calendar-year-month">
@@ -356,24 +396,24 @@ class LunarSolarCalendar extends HTMLElement {
 		<div class="calendar-next"><button type="button"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><path fill="#666" d="M38.8 124.2l52.4-52.42L99 64l-7.77-7.78-52.4-52.4-9.8 7.77L81.44 64 29 116.42z"/></svg></button></div>
 	</div>
 	<div class="calendar-details">
-		<div class="solar-current">
+		<div class="solar">
 			<div class="solar-date">22</div>
 			<div class="solar-day">Thứ Hai</div>
 		</div>
-		<div class="lunar-current">
-			<div class="lunar-month">Tháng Chạp</div>
-			<div class="lunar-date">12</div>
+		<div class="info-left">
 			<div class="lunar-year">Năm Quý Mão</div>
+			<div class="lunar-tietkhi">Tiết Đại Hàn</div>
 		</div>
-		<div class="lunar-names">
+		<div class="lunar">
+			<div class="lunar-date">12</div>
+			<div class="lunar-month">Tháng Chạp</div>
+		</div>
+		<div class="info-right">
 			<div class="lunar-month-canchi">Tháng Ất Sửu</div>
 			<div class="lunar-date-canchi">Ngày Ất Dậu</div>
 			<div class="lunar-hour-canchi">Giờ Bính Tý</div>
-			<div class="lunar-tietkhi">Tiết Đại Hàn</div>
 		</div>
-		<div class="lunar-hours">
-			Giờ Hoàng Đạo:
-		</div>
+		<div class="lunar-hours">Giờ Hoàng Đạo:</div>
 		<div class="lunar-event">
 		</div>
 	</div>
@@ -443,7 +483,7 @@ class LunarSolarCalendar extends HTMLElement {
 					? `<span class="lunar-date">${d}/${m}</span>`
 					: `<span class="lunar-date">${d}</span>`;
 
-			const html = `<a class="${classes}" data-num=${sd} href="/${sy}-${sm}-${sd}"><div class="solar-date">${sd}</div>${lunarDateStr}</a>`;
+			const html = `<a class="${classes}" data-num=${sd} href="#${sy}-${sm}-${sd}"><div class="solar-date">${sd}</div>${lunarDateStr}</a>`;
 			return html;
 		}
 		function attachEvents() {
@@ -451,8 +491,8 @@ class LunarSolarCalendar extends HTMLElement {
 			let nextBtn = wrapper.querySelector('.calendar-next button');
 			let todayDate = wrapper.querySelector('.calendar-today-date');
 			let dateNumberParent = wrapper.querySelector('.calendar-dates');
-			prevBtn.addEventListener('click', navigateToPreviousMonth);
-			nextBtn.addEventListener('click', navigateToNextMonth);
+			prevBtn.addEventListener('click', () => navigateToPreviousMonth());
+			nextBtn.addEventListener('click', () => navigateToNextMonth());
 			todayDate.addEventListener('click', navigateToCurrentMonth);
 			dateNumberParent.addEventListener('click', handleDateClick);
 		}
@@ -470,23 +510,25 @@ class LunarSolarCalendar extends HTMLElement {
 		}
 		function displayDateInfo() {
 			const lunarDayInfo = getLunarDayInfo(selectedDate, 7);
-			wrapper.querySelector('.solar-current .solar-date').textContent = selectedDate.getDate();
-			wrapper.querySelector('.solar-current .solar-day').textContent =
+			wrapper.querySelector('.calendar-details .solar-date').textContent = selectedDate.getDate();
+			wrapper.querySelector('.calendar-details .solar-day').textContent =
 				calWeekDaysFull[selectedDate.getDay()];
-			wrapper.querySelector('.lunar-current .lunar-month').textContent = lunarDayInfo.monthName;
+			wrapper.querySelector('.calendar-details .lunar-month').textContent = lunarDayInfo.monthName;
 
-			wrapper.querySelector('.lunar-current .lunar-date').textContent = lunarDayInfo.date;
-			wrapper.querySelector('.lunar-current .lunar-year').textContent = 'Năm ' + lunarDayInfo.year;
-			wrapper.querySelector('.lunar-names .lunar-month-canchi').textContent =
+			wrapper.querySelector('.calendar-details .lunar-date').textContent = lunarDayInfo.date;
+			wrapper.querySelector('.calendar-details .lunar-year').textContent =
+				'Năm ' + lunarDayInfo.year;
+			wrapper.querySelector('.calendar-details .lunar-month-canchi').textContent =
 				'Tháng ' + lunarDayInfo.ccmonth;
-			wrapper.querySelector('.lunar-names .lunar-date-canchi').textContent =
+			wrapper.querySelector('.calendar-details .lunar-date-canchi').textContent =
 				'Ngày ' + lunarDayInfo.ccdate;
-			wrapper.querySelector('.lunar-names .lunar-hour-canchi').textContent =
+			wrapper.querySelector('.calendar-details .lunar-hour-canchi').textContent =
 				'Giờ ' + lunarDayInfo.cchour;
-			wrapper.querySelector('.lunar-names .lunar-tietkhi').textContent =
+			wrapper.querySelector('.calendar-details .lunar-tietkhi').textContent =
 				'Tiết ' + lunarDayInfo.tietkhi;
-			wrapper.querySelector('.lunar-hours').innerHTML = 'Giờ hoàng đạo: ' + lunarDayInfo.hoangdao;
-			wrapper.querySelector('.lunar-event').innerHTML = lunarDayInfo.lunarEvent;
+			wrapper.querySelector('.calendar-details .lunar-hours').innerHTML =
+				'Giờ hoàng đạo: ' + lunarDayInfo.hoangdao;
+			wrapper.querySelector('.calendar-details .lunar-event').innerHTML = lunarDayInfo.lunarEvent;
 		}
 
 		this.init = function init(wrapperElem) {
