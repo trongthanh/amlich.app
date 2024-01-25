@@ -1,10 +1,10 @@
 // TODO: remove plain-tag
-// import css from 'plain-tag';
-// import html from 'plain-tag';
+import css from 'plain-tag';
+import html from 'plain-tag';
 
 import { convertSolar2Lunar, getLunarDayInfo, findEvents } from '../lib/amlich.js';
 
-const styles = `
+const styles = css`
   :host {
     font-size: 16px;
 
@@ -385,7 +385,7 @@ class LunarSolarCalendar extends HTMLElement {
 			displayDateInfo();
 		}
 		// prettier-ignore
-		this.html = () => `<div class="calendar-inner">
+		this.html = () => html`<div class="calendar-inner">
 	<div class="calendar-controls">
 		<div class="calendar-prev"><button type="button"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><path fill="#666" d="M88.2 3.8L35.8 56.23 28 64l7.8 7.78 52.4 52.4 9.78-7.76L45.58 64l52.4-52.4z"/></svg></button></div>
 		<div class="calendar-year-month">
