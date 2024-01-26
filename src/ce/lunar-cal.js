@@ -278,6 +278,8 @@ class LunarSolarCalendar extends HTMLElement {
 	//TODO: timezone attribute
 	constructor() {
 		super(); // always call super() first in the constructor.
+		// Create a shadow root
+		this._shadow = this.attachShadow({ mode: 'open' });
 
 		let wrapper = null;
 		let selectedDate = (this.selectedDate = new Date());
@@ -540,8 +542,7 @@ class LunarSolarCalendar extends HTMLElement {
 	}
 
 	connectedCallback() {
-		// Create a shadow root
-		const shadow = this.attachShadow({ mode: 'open' });
+		const shadow = this._shadow;
 
 		// Create wrapper
 		const wrapper = document.createElement('div');
@@ -566,7 +567,7 @@ class LunarSolarCalendar extends HTMLElement {
 		// TODO
 	}
 
-	attributeChangedCallback(attrName, oldVal, newVal) {
+	attributeChangedCallback(/* attrName, oldVal, newVal */) {
 		// TODO
 	}
 }

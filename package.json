@@ -2,7 +2,6 @@
 	"name": "amlich.app",
 	"version": "1.0.0",
 	"description": "",
-	"main": "index.js",
 	"keywords": [],
 	"author": "Tran Trong Thanh (int3ractive.com)",
 	"license": "Apache-2.0",
@@ -12,6 +11,8 @@
 		"preview": "vite preview"
 	},
 	"devDependencies": {
+		"eslint": "^8.56.0",
+		"eslint-plugin-wc": "^2.0.4",
 		"plain-tag": "^0.1.3",
 		"vite": "^5.0.8",
 		"vite-plugin-pwa": "^0.17.4"
