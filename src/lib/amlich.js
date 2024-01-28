@@ -8,12 +8,12 @@
  */
 const PI = Math.PI;
 
-/* Discard the fractional part of a number, e.g., INT(3.2) = 3 */
+/** Discard the fractional part of a number, e.g., INT(3.2) = 3 */
 function INT(d) {
 	return Math.floor(d);
 }
 
-/* Compute the (integral) Julian day number of day dd/mm/yyyy, i.e., the number
+/** Compute the (integral) Julian day number of day dd/mm/yyyy, i.e., the number
  * of days between 1/1/4713 BC (Julian calendar) and dd/mm/yyyy.
  * Formula from http://www.tondering.dk/claus/calendar.html
  */
@@ -29,7 +29,7 @@ function jdFromDate(dd, mm, yy) {
 	return jd;
 }
 
-/* Convert a Julian day number to day/month/year. Parameter jd is an integer */
+/** Convert a Julian day number to day/month/year. Parameter jd is an integer */
 function jdToDate(jd) {
 	var a, b, c, d, e, m, day, month, year;
 	if (jd > 2299160) {
@@ -50,7 +50,8 @@ function jdToDate(jd) {
 	return new Array(day, month, year);
 }
 
-/* Compute the time of the k-th new moon after the new moon of 1/1/1900 13:52 UCT
+/**
+ * Compute the time of the k-th new moon after the new moon of 1/1/1900 13:52 UCT
  * (measured as the number of days since 1/1/4713 BC noon UCT, e.g., 2451545.125 is 1/1/2000 15:00 UTC).
  * Returns a floating number, e.g., 2415079.9758617813 for k=2 or 2414961.935157746 for k=-2
  * Algorithm from: "Astronomical Algorithms" by Jean Meeus, 1998
@@ -82,7 +83,8 @@ function NewMoon(k) {
 	return JdNew;
 }
 
-/* Compute the longitude of the sun at any time.
+/**
+ * Compute the longitude of the sun at any time.
  * Parameter: floating number jdn, the number of days since 1/1/4713 BC noon
  * Algorithm from: "Astronomical Algorithms" by Jean Meeus, 1998
  */
@@ -101,7 +103,8 @@ function SunLongitude(jdn) {
 	return L;
 }
 
-/* Compute sun position at midnight of the day with the given Julian day number.
+/**
+ * Compute sun position at midnight of the day with the given Julian day number.
  * The time zone if the time difference between local time and UTC: 7.0 for UTC+7:00.
  * The function returns a number between 0 and 11.
  * From the day after March equinox and the 1st major term after March equinox, 0 is returned.
@@ -111,14 +114,15 @@ function getSunLongitude(dayNumber, timeZone) {
 	return INT((SunLongitude(dayNumber - 0.5 - timeZone / 24) / PI) * 6);
 }
 
-/* Compute the day of the k-th new moon in the given time zone.
+/**
+ * Compute the day of the k-th new moon in the given time zone.
  * The time zone if the time difference between local time and UTC: 7.0 for UTC+7:00
  */
 function getNewMoonDay(k, timeZone) {
 	return INT(NewMoon(k) + 0.5 + timeZone / 24);
 }
 
-/* Find the day that starts the luner month 11 of the given year for the given time zone */
+/** Find the day that starts the lunar month 11 of the given year for the given time zone */
 function getLunarMonth11(yy, timeZone) {
 	var k, off, nm, sunLong;
 	//off = jdFromDate(31, 12, yy) - 2415021.076998695;
@@ -132,7 +136,7 @@ function getLunarMonth11(yy, timeZone) {
 	return nm;
 }
 
-/* Find the index of the leap month after the month starting on the day a11. */
+/** Find the index of the leap month after the month starting on the day a11. */
 function getLeapMonthOffset(a11, timeZone) {
 	var k, last, arc, i;
 	k = INT((a11 - 2415021.076998695) / 29.530588853 + 0.5);
@@ -147,8 +151,8 @@ function getLeapMonthOffset(a11, timeZone) {
 	return i - 1;
 }
 
-/* Comvert solar date dd/mm/yyyy to the corresponding lunar date */
 /**
+ * Convert solar date dd/mm/yyyy to the corresponding lunar date
  * @return {[lunarDay: number, lunarMonth: number, lunarYear: number, lunarLeap: 0 | 1, julianDay: number]} lunar date
  */
 function convertSolar2Lunar(dd, mm, yy, timeZone) {
@@ -191,7 +195,15 @@ function convertSolar2Lunar(dd, mm, yy, timeZone) {
 	return [lunarDay, lunarMonth, lunarYear, lunarLeap, dayNumber];
 }
 
-/* Convert a lunar date to the corresponding solar date */
+/**
+ * Convert a lunar date to the corresponding solar date
+ * @param {number} lunarDay
+ * @param {number} lunarMonth
+ * @param {number} lunarYear
+ * @param {0 | 1} lunarLeap
+ * @param {number} timeZone
+ * @return {[solarDay: number, solarMonth: number, solarYear: number]} solar date
+ **/
 function convertLunar2Solar(lunarDay, lunarMonth, lunarYear, lunarLeap, timeZone) {
 	var k, a11, b11, off, leapOff, leapMonth, monthStart;
 	if (lunarMonth < 11) {
@@ -247,7 +259,8 @@ function YearlyEvent(dd, mm, info, emoji) {
 }
 
 const YEARLY_EVENTS = new Array(
-	new YearlyEvent(1, 1, 'Tết Nguyên Đán', '🌸'),
+	new YearlyEvent(30, 12, '30 Tháng Chạp', '🌸'),
+	new YearlyEvent(1, 1, 'Mùng 1 Tết Nguyên Đán', '🌸'),
 	new YearlyEvent(15, 1, 'Rằm tháng Giêng', '🌕'),
 	new YearlyEvent(10, 3, 'Giỗ Tổ Hùng Vương (10/3 ÂL)', '🙏'),
 	new YearlyEvent(15, 4, 'Phật Đản (15/4 ÂL)', '🪷'),
@@ -261,6 +274,7 @@ const YEARLY_EVENTS = new Array(
  * @param {number} dd Lunar date
  * @param {number} mm Lunar month
  * @return {Array<YearlyEvent>} Yearly events on the given date
+ * @deprecated Built into lunar-cal > LunisolarCalendar
  */
 function findEvents(dd, mm) {
 	const ret = [];
@@ -273,6 +287,12 @@ function findEvents(dd, mm) {
 	return ret;
 }
 
+/**
+ * @param {number} dd Lunar date
+ * @param {number} mm Lunar month
+ * @return {string} Event info
+ * @deprecated Built into lunar-cal > LunisolarCalendar
+ */
 function getEventInfo(dd, mm) {
 	const events = findEvents(dd, mm);
 	let ret = '';
@@ -294,7 +314,6 @@ function getEventInfo(dd, mm) {
  *   ccdate: string,
  *   cchour: string,
  *   tietkhi: string,
- *   lunarEvent: string,
  *   hoangdao: string
  * }} Lunar day info
  */
@@ -320,7 +339,6 @@ function getLunarDayInfo(solarDate, timeZone) {
 		ccdate: CAN[(jd + 9) % 10] + ' ' + CHI[(jd + 1) % 12],
 		cchour: getCanHour0(jd) + ' ' + CHI[0],
 		tietkhi: TIETKHI[getSolarTerm(jd + 1, timeZone)],
-		lunarEvent: getEventInfo(dd, mm),
 		hoangdao: getGioHoangDao(jd),
 	};
 }
@@ -366,7 +384,6 @@ export {
 	// NewMoon,
 	// SunLongitude,
 	// getCanHour0,
-	// getEventInfo,
 	// getGioHoangDao,
 	// getLeapMonthOffset,
 	// getLunarMonth11,
@@ -386,5 +403,6 @@ export {
 	convertLunar2Solar,
 	convertSolar2Lunar,
 	findEvents,
+	getEventInfo,
 	getLunarDayInfo,
 };

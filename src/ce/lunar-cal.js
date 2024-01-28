@@ -2,7 +2,7 @@
 import css from 'plain-tag';
 import html from 'plain-tag';
 
-import { convertSolar2Lunar, getLunarDayInfo, findEvents } from '../lib/amlich.js';
+import { convertSolar2Lunar, getLunarDayInfo } from '../lib/amlich.js';
 
 const styles = css`
   :host {
@@ -21,9 +21,11 @@ const styles = css`
     --calendar-border-radius: 16px;
     --calendar-selected-border-color: #fff;
     --calendar-active-bg-color: #505050;
-    --calendar-weekend-color: #fca5a5;
+    --calendar-weekend-color: #22c55e;
     --lunar-date-color: #facc15;
     --lunar-date-event-color: #dc2626;
+    --today-event-color: #fca5a5;
+    --public-holiday-color: #dc2626;
   }
 
   * {
@@ -38,7 +40,7 @@ const styles = css`
     min-width: 320px;
     background: var(--calendar-bg-color);
     color: var(--calendar-font-color);
-    margin: 20px auto;
+    margin: 10px auto;
     box-sizing: border-box;
     overflow: hidden;
     font-weight: normal;
@@ -96,6 +98,11 @@ const styles = css`
   }
   .date-number.lunar-event .lunar-date {
     color: var(--lunar-date-event-color);
+    font-weight: 700;
+  }
+
+  .date-number.public-holiday .solar-date {
+    color: var(--public-holiday-color);
     font-weight: 700;
   }
 
@@ -177,10 +184,7 @@ const styles = css`
   .calendar-controls button svg {
     height: 20px;
     width: 20px;
-  }
-
-  .calendar-controls button svg path {
-    fill: var(--calendar-arrow-color);
+    color: var(--calendar-arrow-color);
   }
 
   .calendar-body .prev-dates,
@@ -233,6 +237,10 @@ const styles = css`
     font-size: 18px;
   }
 
+  .calendar-details .public-holiday {
+    color: var(--public-holiday-color);
+  }
+
   .calendar-details .lunar {
     grid-area: lunar;
     text-align: center;
@@ -266,20 +274,94 @@ const styles = css`
     font-size: 12px;
   }
 
-  .calendar-details .lunar-event {
+  .calendar-details .today-event {
     grid-area: event;
     padding: 0px;
-    color: var(--calendar-weekend-color);
+    color: var(--today-event-color);
     text-align: center;
   }
 `;
+/**
+ * @typedef {{type: 'SOLAR'|'LUNAR'|number, month: number, day: number, name: string, publicHoliday: boolean }} YearlyEvent
+ */
 
-class LunarSolarCalendar extends HTMLElement {
+/**
+ * @param {string} eventDateStr event date string in format SOLAR--MM-DD or LUNAR--MM-DD or YYYY-MM-DD
+ * @param {string} name event name
+ * @param {boolean} publicHoliday whether it's public holiday (red color on solar date)
+ * @returns {YearlyEvent} event object
+ */
+function createEvent(eventDateStr, name, publicHoliday = false) {
+	const dateReg = /(SOLAR|LUNAR|\d{4})-?-(\d{1,2})-(\d{1,2})/;
+	const [, type, month, day] = dateReg.exec(eventDateStr) || [];
+	return { type, month: parseInt(month, 10), day: parseInt(day, 10), name, publicHoliday };
+}
+
+/**
+ * @param {YearlyEvent[]} yearlyEvents
+ * @returns {(sy: number, sy: number, sd:number, lm:number, ld:number) => ({isLunarEvent: boolean, isPublicHoliday: boolean, isSolarEvent: boolean, eventNames: string[]})}
+ */
+function createFindEvents(yearlyEvents) {
+	return function findEvents(sy, sm, sd, lm, ld) {
+		const events = [];
+		yearlyEvents.forEach((event) => {
+			if (event.type === 'SOLAR' && event.month === sm && event.day === sd) {
+				events.push(event);
+			}
+			if (event.type === 'LUNAR' && event.month === lm && event.day === ld) {
+				events.push(event);
+			}
+			if (event.type == sy && event.month === sm && event.day === sd) {
+				events.push(event);
+			}
+		});
+		return {
+			isLunarEvent: events.some((e) => e.type === 'LUNAR'),
+			isPublicHoliday: events.some((e) => e.publicHoliday),
+			isSolarEvent: events.some((e) => e.type === 'SOLAR'),
+			eventNames: events.map((e) => e.name),
+		};
+	};
+}
+
+const DEFAULT_EVENTS = [
+	createEvent('SOLAR--1-1', '🎆 Tết Dương lịch 🎆', true),
+	createEvent('SOLAR--04-30', '🇻🇳 Ngày Chiến thắng 🇻🇳', true),
+	createEvent('SOLAR--05-01', '🇻🇳 Quốc Tế Lao Động 🇻🇳', true),
+	createEvent('SOLAR--09-02', '🇻🇳 Lễ Quốc Khánh 🇻🇳', true),
+
+	createEvent('LUNAR--01-01', '🌸 Mùng 1 Tết Nguyên Đán 🌸', true),
+	createEvent('LUNAR--01-02', '🌸 Mùng 2 Tết Nguyên Đán 🌸', true),
+	createEvent('LUNAR--01-03', '🌸 Mùng 3 Tết Nguyên Đán 🌸', true),
+	createEvent('LUNAR--01-15', '🌕 Rằm tháng Giêng 🌕', false),
+	createEvent('LUNAR--03-10', '🙏 Giỗ Tổ Hùng Vương (10/3 ÂL) 🙏', true),
+	createEvent('LUNAR--04-15', '🪷 Phật Đản (15/4 ÂL) 🪷', false),
+	createEvent('LUNAR--05-05', '🌾 Tết Đoan Ngọ (5/5 ÂL) 🌾', false),
+	createEvent('LUNAR--07-15', '🕯️ Vu Lan (15/7 ÂL) 🕯️', false),
+	createEvent('LUNAR--08-15', '🥮 Tết Trung Thu (Rằm tháng 8) 🥮', false),
+	createEvent('LUNAR--12-23', '🍚 Ông Táo chầu trời (23/12 ÂL) 🍚', false),
+	createEvent('LUNAR--12-30', '🌸 30 Tháng Chạp 🌸', true),
+];
+
+class LunisolarCalendar extends HTMLElement {
 	//TODO: timezone attribute
 	constructor() {
 		super(); // always call super() first in the constructor.
 		// Create a shadow root
-		this._shadow = this.attachShadow({ mode: 'open' });
+		this.attachShadow({ mode: 'open' });
+		// store public holidays
+		// eslint-disable-next-line wc/no-constructor-attributes
+		const pubDataset = this.querySelectorAll('[slot="public-holidays"] > option');
+		const publicHolidays = [];
+		console.log(pubDataset);
+		if (pubDataset.length) {
+			Array.from(pubDataset).forEach((elem) => {
+				publicHolidays.push(createEvent(elem.value, elem.textContent, true));
+			});
+		}
+		console.log(publicHolidays);
+		const yearlyEvents = DEFAULT_EVENTS.concat(publicHolidays);
+		const findEvents = createFindEvents(yearlyEvents);
 
 		let wrapper = null;
 		let selectedDate = (this.selectedDate = new Date());
@@ -389,13 +471,13 @@ class LunarSolarCalendar extends HTMLElement {
 		// prettier-ignore
 		this.html = () => html`<div class="calendar-inner">
 	<div class="calendar-controls">
-		<div class="calendar-prev"><button type="button"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><path fill="#666" d="M88.2 3.8L35.8 56.23 28 64l7.8 7.78 52.4 52.4 9.78-7.76L45.58 64l52.4-52.4z"/></svg></button></div>
+		<div class="calendar-prev"><button type="button" aria-label="Previous Month"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><path fill="currentColor" d="M88.2 3.8L35.8 56.23 28 64l7.8 7.78 52.4 52.4 9.78-7.76L45.58 64l52.4-52.4z"/></svg></button></div>
 		<div class="calendar-year-month">
 			<span class="calendar-month-label"></span>
 			<span>-</span>
 			<span class="calendar-year-label"></span>
 		</div>
-		<div class="calendar-next"><button type="button"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><path fill="#666" d="M38.8 124.2l52.4-52.42L99 64l-7.77-7.78-52.4-52.4-9.8 7.77L81.44 64 29 116.42z"/></svg></button></div>
+		<div class="calendar-next"><button type="button" aria-label="Next Month"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><path fill="currentColor" d="M38.8 124.2l52.4-52.42L99 64l-7.77-7.78-52.4-52.4-9.8 7.77L81.44 64 29 116.42z"/></svg></button></div>
 	</div>
 	<div class="calendar-details">
 		<div class="solar">
@@ -416,7 +498,7 @@ class LunarSolarCalendar extends HTMLElement {
 			<div class="lunar-hour-canchi">Giờ Bính Tý</div>
 		</div>
 		<div class="lunar-hours">Giờ Hoàng Đạo:</div>
-		<div class="lunar-event">
+		<div class="today-event">
 		</div>
 	</div>
 	<div class="calendar-body">
@@ -429,6 +511,7 @@ class LunarSolarCalendar extends HTMLElement {
 		${calMonthName[localDate.getMonth()]}
 		${localDate.getFullYear()}
 	</button>
+	<slot name="public-holidays"></slot>
 </div>`;
 
 		function plotDayNames() {
@@ -458,34 +541,35 @@ class LunarSolarCalendar extends HTMLElement {
 				if (i <= firstDayPos) {
 					// dates of previous month
 					html += dateCell(
-						prevMonthLastDate.getDate() + i - firstDayPos,
-						prevMonthLastDate.getMonth() + 1,
 						prevMonthLastDate.getFullYear(),
+						prevMonthLastDate.getMonth() + 1,
+						prevMonthLastDate.getDate() + i - firstDayPos,
 						7,
 						'prev-dates'
 					);
 				} else if (i > firstDayPos && i <= prevAndCurrDaysCount) {
 					// dates of current month
-					html += dateCell(i - firstDayPos, calMonth, calYear, 7);
+					html += dateCell(calYear, calMonth, i - firstDayPos, 7);
 				} else {
 					// dates of next month
-					html += dateCell(i - prevAndCurrDaysCount, calMonth + 1, calYear, 7, 'next-dates');
+					html += dateCell(calYear, calMonth + 1, i - prevAndCurrDaysCount, 7, 'next-dates');
 				}
 			}
 			wrapper.querySelector('.calendar-dates').innerHTML = html;
 			highlightToday();
 		}
-		function dateCell(sd, sm, sy, timeZone, className = 'date-number') {
+		function dateCell(sy, sm, sd, timeZone, className = 'date-number') {
 			// am lich
 			let [d, m] = convertSolar2Lunar(sd, sm, sy, timeZone);
-			let isEvent = !!findEvents(d, m).length;
-			let classes = className + (isEvent ? ' lunar-event' : '');
+			let event = findEvents(sy, sm, sd, m, d);
+			let classes =
+				className +
+				(event.isLunarEvent ? ' lunar-event' : '') +
+				(event.isSolarEvent || event.isPublicHoliday ? ' public-holiday' : '');
 			const lunarDateStr =
-				d === 1 || sd === 1
-					? `<span class="lunar-date">${d}/${m}</span>`
-					: `<span class="lunar-date">${d}</span>`;
+				d === 1 || sd === 1 ? `${d}/${m}` : d === 15 ? `${d} <small>🌕</small>` : `${d}`;
 
-			const html = `<a class="${classes}" data-num=${sd} href="#${sy}-${sm}-${sd}"><div class="solar-date">${sd}</div>${lunarDateStr}</a>`;
+			const html = `<a class="${classes}" data-num=${sd} href="#${sy}-${sm}-${sd}"><div class="solar-date">${sd}</div><span class="lunar-date">${lunarDateStr}</span></a>`;
 			return html;
 		}
 		function attachEvents() {
@@ -512,25 +596,40 @@ class LunarSolarCalendar extends HTMLElement {
 		}
 		function displayDateInfo() {
 			const lunarDayInfo = getLunarDayInfo(selectedDate, 7);
-			wrapper.querySelector('.calendar-details .solar-date').textContent = selectedDate.getDate();
-			wrapper.querySelector('.calendar-details .solar-day').textContent =
-				calWeekDaysFull[selectedDate.getDay()];
-			wrapper.querySelector('.calendar-details .lunar-month').textContent = lunarDayInfo.monthName;
+			const thisDate = findEvents(
+				selectedDate.getFullYear(),
+				selectedDate.getMonth() + 1,
+				selectedDate.getDate(),
+				lunarDayInfo.month,
+				lunarDayInfo.date
+			);
+			console.log(thisDate);
+			const dateDetails = wrapper.querySelector('.calendar-details');
+			dateDetails.querySelector('.solar-date').textContent = selectedDate.getDate();
+			dateDetails.querySelector('.solar-day').textContent = calWeekDaysFull[selectedDate.getDay()];
+			dateDetails.querySelector('.lunar-month').textContent = lunarDayInfo.monthName;
 
-			wrapper.querySelector('.calendar-details .lunar-date').textContent = lunarDayInfo.date;
-			wrapper.querySelector('.calendar-details .lunar-year').textContent =
-				'Năm ' + lunarDayInfo.year;
-			wrapper.querySelector('.calendar-details .lunar-month-canchi').textContent =
+			dateDetails.querySelector('.lunar-date').textContent = lunarDayInfo.date;
+			dateDetails.querySelector('.lunar-year').textContent = 'Năm ' + lunarDayInfo.year;
+			dateDetails.querySelector('.lunar-month-canchi').textContent =
 				'Tháng ' + lunarDayInfo.ccmonth;
-			wrapper.querySelector('.calendar-details .lunar-date-canchi').textContent =
-				'Ngày ' + lunarDayInfo.ccdate;
-			wrapper.querySelector('.calendar-details .lunar-hour-canchi').textContent =
-				'Giờ ' + lunarDayInfo.cchour;
-			wrapper.querySelector('.calendar-details .lunar-tietkhi').textContent =
-				'Tiết ' + lunarDayInfo.tietkhi;
-			wrapper.querySelector('.calendar-details .lunar-hours').innerHTML =
+			dateDetails.querySelector('.lunar-date-canchi').textContent = 'Ngày ' + lunarDayInfo.ccdate;
+			dateDetails.querySelector('.lunar-hour-canchi').textContent = 'Giờ ' + lunarDayInfo.cchour;
+			dateDetails.querySelector('.lunar-tietkhi').textContent = 'Tiết ' + lunarDayInfo.tietkhi;
+			dateDetails.querySelector('.lunar-hours').innerHTML =
 				'Giờ hoàng đạo: ' + lunarDayInfo.hoangdao;
-			wrapper.querySelector('.calendar-details .lunar-event').innerHTML = lunarDayInfo.lunarEvent;
+			if (thisDate.isPublicHoliday) {
+				dateDetails.querySelector('.solar-date').classList.add('public-holiday');
+				dateDetails.querySelector('.solar-day').classList.add('public-holiday');
+			} else {
+				dateDetails.querySelector('.solar-date').classList.remove('public-holiday');
+				dateDetails.querySelector('.solar-day').classList.remove('public-holiday');
+			}
+			if (thisDate.eventNames.length) {
+				dateDetails.querySelector('.today-event').innerHTML = thisDate.eventNames.join('. ');
+			} else {
+				dateDetails.querySelector('.today-event').innerHTML = '';
+			}
 		}
 
 		this.init = function init(wrapperElem) {
@@ -542,7 +641,7 @@ class LunarSolarCalendar extends HTMLElement {
 	}
 
 	connectedCallback() {
-		const shadow = this._shadow;
+		const shadow = this.shadowRoot;
 
 		// Create wrapper
 		const wrapper = document.createElement('div');
@@ -572,4 +671,6 @@ class LunarSolarCalendar extends HTMLElement {
 	}
 }
 
-window.customElements.define('lunar-cal', LunarSolarCalendar);
+window.customElements.define('lunar-cal', LunisolarCalendar);
+
+export { LunisolarCalendar, DEFAULT_EVENTS };
