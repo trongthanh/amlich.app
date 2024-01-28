@@ -344,11 +344,15 @@ const DEFAULT_EVENTS = [
 ];
 
 class LunisolarCalendar extends HTMLElement {
+	static observedAttributes = ['initial-date', 'timezone', 'info-hidden'];
+
 	//TODO: timezone attribute
 	constructor() {
 		super(); // always call super() first in the constructor.
 		// Create a shadow root
 		this.attachShadow({ mode: 'open' });
+		// the wrapper element
+		let wrapper = null;
 		// store public holidays
 		// eslint-disable-next-line wc/no-constructor-attributes
 		const pubDataset = this.querySelectorAll('[slot="public-holidays"] > option');
@@ -363,11 +367,13 @@ class LunisolarCalendar extends HTMLElement {
 		const yearlyEvents = DEFAULT_EVENTS.concat(publicHolidays);
 		const findEvents = createFindEvents(yearlyEvents);
 
-		let wrapper = null;
-		let selectedDate = (this.selectedDate = new Date());
+		let initialDateFromAttr =
+			this.hasAttribute('initial-date') && new Date(this.getAttribute('initial-date'));
+
+		let selectedDate = isNaN(initialDateFromAttr) ? new Date() : initialDateFromAttr; // display today if initial-date not defined
 
 		// private properties
-		let localDate = new Date();
+		let today = new Date();
 		let calWeekDays = ['CN', 'Hai', 'Ba', 'Tư', 'Năm', 'Sáu', 'Bảy'];
 		// prettier-ignore
 		let calWeekDaysFull = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
@@ -422,11 +428,11 @@ class LunisolarCalendar extends HTMLElement {
 			selectDate();
 		}
 		function navigateToCurrentMonth() {
-			let currentMonth = localDate.getMonth();
-			let currentYear = localDate.getFullYear();
+			let currentMonth = today.getMonth();
+			let currentYear = today.getFullYear();
 			selectedDate.setMonth(currentMonth);
 			selectedDate.setYear(currentYear);
-			selectedDate.setDate(localDate.getDate());
+			selectedDate.setDate(today.getDate());
 			plotDates();
 		}
 		function displayYear() {
@@ -506,10 +512,10 @@ class LunisolarCalendar extends HTMLElement {
 		<div class="calendar-dates"></div>
 	</div>
 	<button class="calendar-today-date">Hôm nay:
-		${calWeekDaysFull[localDate.getDay()]},
-		${localDate.getDate()}
-		${calMonthName[localDate.getMonth()]}
-		${localDate.getFullYear()}
+		${calWeekDaysFull[today.getDay()]},
+		${today.getDate()}
+		${calMonthName[today.getMonth()]}
+		${today.getFullYear()}
 	</button>
 	<slot name="public-holidays"></slot>
 </div>`;
@@ -572,6 +578,7 @@ class LunisolarCalendar extends HTMLElement {
 			const html = `<a class="${classes}" data-num=${sd} href="#${sy}-${sm}-${sd}"><div class="solar-date">${sd}</div><span class="lunar-date">${lunarDateStr}</span></a>`;
 			return html;
 		}
+
 		function attachEvents() {
 			let prevBtn = wrapper.querySelector('.calendar-prev button');
 			let nextBtn = wrapper.querySelector('.calendar-next button');
@@ -582,15 +589,25 @@ class LunisolarCalendar extends HTMLElement {
 			todayDate.addEventListener('click', navigateToCurrentMonth);
 			dateNumberParent.addEventListener('click', handleDateClick);
 		}
+		function removeEvents() {
+			let prevBtn = wrapper.querySelector('.calendar-prev button');
+			let nextBtn = wrapper.querySelector('.calendar-next button');
+			let todayDate = wrapper.querySelector('.calendar-today-date');
+			let dateNumberParent = wrapper.querySelector('.calendar-dates');
+			prevBtn.removeEventListener('click', () => navigateToPreviousMonth());
+			nextBtn.removeEventListener('click', () => navigateToNextMonth());
+			todayDate.removeEventListener('click', navigateToCurrentMonth);
+			dateNumberParent.removeEventListener('click', handleDateClick);
+		}
 		function highlightToday() {
-			let currentMonth = localDate.getMonth() + 1;
+			let currentMonth = today.getMonth() + 1;
 			let changedMonth = selectedDate.getMonth() + 1;
-			let currentYear = localDate.getFullYear();
+			let currentYear = today.getFullYear();
 			let changedYear = selectedDate.getFullYear();
 			if (currentYear === changedYear && currentMonth === changedMonth) {
 				wrapper
 					.querySelectorAll('.date-number')
-				[localDate.getDate() - 1].classList.add('calendar-today');
+				[today.getDate() - 1].classList.add('calendar-today');
 				selectDate();
 			}
 		}
@@ -632,12 +649,28 @@ class LunisolarCalendar extends HTMLElement {
 			}
 		}
 
-		this.init = function init(wrapperElem) {
+		function setSelectedDate(date) {
+			if (date instanceof Date && !isNaN(date)) {
+				selectedDate = date;
+				plotDates();
+				selectDate();
+				return;
+			}
+			throw new RangeError('Invalid initial-date');
+		}
+
+		function init(wrapperElem) {
 			wrapper = this.wrapper = wrapperElem;
 			plotDayNames();
 			plotDates();
+			selectDate();
 			attachEvents();
-		};
+		}
+
+		// public methods:
+		this.init = init.bind(this);
+		this.setSelectedDate = setSelectedDate.bind(this);
+		this.removeEvents = removeEvents.bind(this);
 	}
 
 	connectedCallback() {
@@ -651,23 +684,26 @@ class LunisolarCalendar extends HTMLElement {
 		// Create inner styles
 		// Create some CSS to apply to the shadow dom
 		const style = document.createElement('style');
-		console.log(style.isConnected);
-
 		style.textContent = styles;
 
 		// Attach the created elements to the shadow dom
 		shadow.appendChild(style);
-		console.log(style.isConnected);
 		this.init(wrapper);
 		shadow.appendChild(wrapper);
 	}
 
 	disconnectedCallback() {
-		// TODO
+		this.removeEvents();
 	}
 
-	attributeChangedCallback(/* attrName, oldVal, newVal */) {
-		// TODO
+	attributeChangedCallback(name, oldVal, newVal) {
+		if (!this.wrapper) {
+			// initial render, wrapper is not init
+			return;
+		}
+		if (name === 'initial-date' && newVal !== oldVal) {
+			this.setSelectedDate(new Date(newVal));
+		}
 	}
 }
 
