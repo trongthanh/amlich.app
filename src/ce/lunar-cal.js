@@ -5,281 +5,281 @@ import html from 'plain-tag';
 import { convertSolar2Lunar, getLunarDayInfo } from '../lib/amlich.js';
 
 const styles = css`
-  :host {
-    font-size: 16px;
+	:host {
+		font-size: 16px;
 
-    --calendar-bg-color: #262829;
-    --calendar-font-color: #fff;
-    --weekdays-border-bottom-color: #404040;
-    --calendar-date-hover-color: #505050;
-    --calendar-current-date-color: #1b1f21;
-    --calendar-today-color: linear-gradient(to bottom, #03a9f4, #2196f3);
-    --calendar-today-innerborder-color: transparent;
-    --calendar-nextprev-bg-color: transparent;
-    --calendar-prevnext-date-color: #484848;
-    --calendar-arrow-color: #fff;
-    --calendar-border-radius: 16px;
-    --calendar-selected-border-color: #fff;
-    --calendar-active-bg-color: #505050;
-    --calendar-weekend-color: #22c55e;
-    --lunar-date-color: #facc15;
-    --lunar-date-event-color: #dc2626;
-    --today-event-color: #fca5a5;
-    --public-holiday-color: #dc2626;
-  }
+		--calendar-bg-color: #262829;
+		--calendar-font-color: #fff;
+		--weekdays-border-bottom-color: #404040;
+		--calendar-date-hover-color: #505050;
+		--calendar-current-date-color: #1b1f21;
+		--calendar-today-color: linear-gradient(to bottom, #03a9f4, #2196f3);
+		--calendar-today-innerborder-color: transparent;
+		--calendar-nextprev-bg-color: transparent;
+		--calendar-prevnext-date-color: #484848;
+		--calendar-arrow-color: #fff;
+		--calendar-border-radius: 16px;
+		--calendar-selected-border-color: #fff;
+		--calendar-active-bg-color: #505050;
+		--calendar-weekend-color: #22c55e;
+		--lunar-date-color: #facc15;
+		--lunar-date-event-color: #dc2626;
+		--today-event-color: #fca5a5;
+		--public-holiday-color: #dc2626;
+	}
 
-  * {
-    padding: 0;
-    margin: 0;
-  }
+	* {
+		padding: 0;
+		margin: 0;
+	}
 
-  .calendar {
-    position: relative;
-    max-width: 400px;
-    /*change as per your design need */
-    min-width: 320px;
-    background: var(--calendar-bg-color);
-    color: var(--calendar-font-color);
-    margin: 10px auto;
-    box-sizing: border-box;
-    overflow: hidden;
-    font-weight: normal;
-    border-radius: var(--calendar-border-radius);
-  }
+	.calendar {
+		position: relative;
+		max-width: 400px;
+		/*change as per your design need */
+		min-width: 320px;
+		background: var(--calendar-bg-color);
+		color: var(--calendar-font-color);
+		margin: 10px auto;
+		box-sizing: border-box;
+		overflow: hidden;
+		font-weight: normal;
+		border-radius: var(--calendar-border-radius);
+	}
 
-  .calendar-inner {
-    padding: 10px 10px;
-  }
+	.calendar-inner {
+		padding: 10px 10px;
+	}
 
-  .calendar-weekdays,
-  .calendar-dates {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    text-align: center;
-    line-height: 1.3;
-  }
+	.calendar-weekdays,
+	.calendar-dates {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		text-align: center;
+		line-height: 1.3;
+	}
 
-  .calendar-weekdays > div {
-    padding: 8px 0;
-    border-bottom: 1px solid var(--weekdays-border-bottom-color);
-  }
+	.calendar-weekdays > div {
+		padding: 8px 0;
+		border-bottom: 1px solid var(--weekdays-border-bottom-color);
+	}
 
-  .calendar-weekdays > div:nth-child(7n),
-  .calendar-weekdays > div:nth-child(7n - 1),
-  .calendar-dates > .date-number:nth-child(7n),
-  .calendar-dates > .date-number:nth-child(7n -1) {
-    color: var(--calendar-weekend-color);
-  }
+	.calendar-weekdays > div:nth-child(7n),
+	.calendar-weekdays > div:nth-child(7n - 1),
+	.calendar-dates > .date-number:nth-child(7n),
+	.calendar-dates > .date-number:nth-child(7n -1) {
+		color: var(--calendar-weekend-color);
+	}
 
-  .date-number,
-  .next-dates,
-  .prev-dates {
-    border: 1px solid transparent;
-    border-radius: 4px;
-    padding: 4px 0;
-    color: var(--calendar-font-color);
-    text-decoration: none;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin: 2px;
-  }
+	.date-number,
+	.next-dates,
+	.prev-dates {
+		border: 1px solid transparent;
+		border-radius: 4px;
+		padding: 4px 0;
+		color: var(--calendar-font-color);
+		text-decoration: none;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		margin: 2px;
+	}
 
-  .date-number:hover {
-    border: 1px solid var(--calendar-date-hover-color);
-  }
+	.date-number:hover {
+		border: 1px solid var(--calendar-date-hover-color);
+	}
 
-  .date-number:active {
-    border: 1px solid var(--calendar-date-hover-color);
-    background: var(--calendar-active-bg-color);
-  }
-  .date-number.selected {
-    border: 1px solid var(--calendar-selected-border-color);
-  }
-  .date-number.lunar-event .lunar-date {
-    color: var(--lunar-date-event-color);
-    font-weight: 700;
-  }
+	.date-number:active {
+		border: 1px solid var(--calendar-date-hover-color);
+		background: var(--calendar-active-bg-color);
+	}
+	.date-number.selected {
+		border: 1px solid var(--calendar-selected-border-color);
+	}
+	.date-number.lunar-event .lunar-date {
+		color: var(--lunar-date-event-color);
+		font-weight: 700;
+	}
 
-  .date-number.public-holiday .solar-date {
-    color: var(--public-holiday-color);
-    font-weight: 700;
-  }
+	.date-number.public-holiday .solar-date {
+		color: var(--public-holiday-color);
+		font-weight: 700;
+	}
 
-  .empty-dates:hover {
-    border: 1px solid transparent;
-  }
+	.empty-dates:hover {
+		border: 1px solid transparent;
+	}
 
-  .calendar-controls {
-    display: grid;
-    grid-template-columns: 25% auto 25%;
-  }
+	.calendar-controls {
+		display: grid;
+		grid-template-columns: 25% auto 25%;
+	}
 
-  .calendar-today-date {
-    display: grid;
-    text-align: center;
-    cursor: pointer;
-    margin: 3px 0px;
-    background: var(--calendar-current-date-color);
-    padding: 8px 0px;
-    border-radius: 10px;
-    border: 1px solid var(--calendar-current-date-color);
-    color: var(--calendar-font-color);
-    width: 80%;
-    margin: 8px auto;
-  }
+	.calendar-today-date {
+		display: grid;
+		text-align: center;
+		cursor: pointer;
+		margin: 3px 0px;
+		background: var(--calendar-current-date-color);
+		padding: 8px 0px;
+		border-radius: 10px;
+		border: 1px solid var(--calendar-current-date-color);
+		color: var(--calendar-font-color);
+		width: 80%;
+		margin: 8px auto;
+	}
 
-  .calendar-today-date:hover {
-    border: 1px solid var(--calendar-date-hover-color);
-  }
+	.calendar-today-date:hover {
+		border: 1px solid var(--calendar-date-hover-color);
+	}
 
-  .calendar-today-date:active {
-    background: var(--calendar-active-bg-color);
-  }
+	.calendar-today-date:active {
+		background: var(--calendar-active-bg-color);
+	}
 
-  .calendar-controls .calendar-year-month {
-    display: flex;
-    min-width: 100px;
-    justify-content: space-evenly;
-    align-items: center;
-  }
+	.calendar-controls .calendar-year-month {
+		display: flex;
+		min-width: 100px;
+		justify-content: space-evenly;
+		align-items: center;
+	}
 
-  .calendar-controls .calendar-next {
-    text-align: right;
-  }
+	.calendar-controls .calendar-next {
+		text-align: right;
+	}
 
-  .calendar-controls .calendar-year-month .calendar-year-label,
-  .calendar-controls .calendar-year-month .calendar-month-label {
-    font-weight: 600;
-    font-size: 20px;
-  }
+	.calendar-controls .calendar-year-month .calendar-year-label,
+	.calendar-controls .calendar-year-month .calendar-month-label {
+		font-weight: 600;
+		font-size: 20px;
+	}
 
-  .calendar-body .calendar-today {
-    background: var(--calendar-today-color);
-  }
+	.calendar-body .calendar-today {
+		background: var(--calendar-today-color);
+	}
 
-  .calendar-body .calendar-today.selected {
-    border: 1px solid transparent;
-  }
+	.calendar-body .calendar-today.selected {
+		border: 1px solid transparent;
+	}
 
-  /* next & previous buttons */
-  .calendar-controls button {
-    color: var(--calendar-font-color);
-    font-family: arial, consolas, sans-serif;
-    font-size: 26px;
-    text-decoration: none;
-    padding: 8px 12px;
-    display: inline-block;
-    background: var(--calendar-nextprev-bg-color);
-    border: 1px solid transparent;
-    cursor: pointer;
-  }
-  .calendar-controls button:hover {
-    border: 1px solid var(--calendar-date-hover-color);
-  }
-  .calendar-controls button:active {
-    border: 1px solid var(--calendar-date-hover-color);
-    background: var(--calendar-active-bg-color);
-  }
-  .calendar-controls button svg {
-    height: 20px;
-    width: 20px;
-    color: var(--calendar-arrow-color);
-  }
+	/* next & previous buttons */
+	.calendar-controls button {
+		color: var(--calendar-font-color);
+		font-family: arial, consolas, sans-serif;
+		font-size: 26px;
+		text-decoration: none;
+		padding: 8px 12px;
+		display: inline-block;
+		background: var(--calendar-nextprev-bg-color);
+		border: 1px solid transparent;
+		cursor: pointer;
+	}
+	.calendar-controls button:hover {
+		border: 1px solid var(--calendar-date-hover-color);
+	}
+	.calendar-controls button:active {
+		border: 1px solid var(--calendar-date-hover-color);
+		background: var(--calendar-active-bg-color);
+	}
+	.calendar-controls button svg {
+		height: 20px;
+		width: 20px;
+		color: var(--calendar-arrow-color);
+	}
 
-  .calendar-body .prev-dates,
-  .calendar-body .next-dates {
-    color: var(--calendar-prevnext-date-color);
-    text-decoration: none;
-  }
+	.calendar-body .prev-dates,
+	.calendar-body .next-dates {
+		color: var(--calendar-prevnext-date-color);
+		text-decoration: none;
+	}
 
-  .calendar-body .prev-dates:hover,
-  .calendar-body .next-dates:hover {
-    border: 1px solid transparent;
-  }
+	.calendar-body .prev-dates:hover,
+	.calendar-body .next-dates:hover {
+		border: 1px solid transparent;
+	}
 
-  .calendar-body .lunar-date {
-    font-size: 12px;
-    color: var(--lunar-date-color);
-  }
+	.calendar-body .lunar-date {
+		font-size: 12px;
+		color: var(--lunar-date-color);
+	}
 
-  .calendar-body .prev-dates .lunar-date,
-  .calendar-body .next-dates .lunar-date {
-    color: var(--calendar-prevnext-date-color);
-  }
+	.calendar-body .prev-dates .lunar-date,
+	.calendar-body .next-dates .lunar-date {
+		color: var(--calendar-prevnext-date-color);
+	}
 
-  .calendar-details {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: auto;
-    gap: 0px 0px;
-    grid-template-areas:
-      '. solar .'
-      'left lunar right'
-      'hours hours hours'
-      'event event event';
-    font-size: 14px;
-  }
+	.calendar-details {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		grid-template-rows: auto;
+		gap: 0px 0px;
+		grid-template-areas:
+			'. solar .'
+			'left lunar right'
+			'hours hours hours'
+			'event event event';
+		font-size: 14px;
+	}
 
-  .calendar-details .solar {
-    grid-area: solar;
-    text-align: center;
-    padding: 0px;
-  }
+	.calendar-details .solar {
+		grid-area: solar;
+		text-align: center;
+		padding: 0px;
+	}
 
-  .calendar-details .solar-date {
-    font-size: 56px;
-    line-height: 1;
-    padding: 4px 0 12px 0;
-  }
+	.calendar-details .solar-date {
+		font-size: 56px;
+		line-height: 1;
+		padding: 4px 0 12px 0;
+	}
 
-  .calendar-details .solar-day {
-    font-size: 18px;
-  }
+	.calendar-details .solar-day {
+		font-size: 18px;
+	}
 
-  .calendar-details .public-holiday {
-    color: var(--public-holiday-color);
-  }
+	.calendar-details .public-holiday {
+		color: var(--public-holiday-color);
+	}
 
-  .calendar-details .lunar {
-    grid-area: lunar;
-    text-align: center;
-  }
-  .calendar-details .lunar-year {
-    font-size: 14px;
-  }
-  .calendar-details .lunar-month {
-    color: var(--lunar-date-color);
-  }
+	.calendar-details .lunar {
+		grid-area: lunar;
+		text-align: center;
+	}
+	.calendar-details .lunar-year {
+		font-size: 14px;
+	}
+	.calendar-details .lunar-month {
+		color: var(--lunar-date-color);
+	}
 
-  .calendar-details .lunar-date {
-    font-size: 32px;
-    color: var(--lunar-date-color);
-    padding: 8px 0px;
-  }
+	.calendar-details .lunar-date {
+		font-size: 32px;
+		color: var(--lunar-date-color);
+		padding: 8px 0px;
+	}
 
-  .calendar-details .info-left {
-    grid-area: left;
-    font-size: 12px;
-  }
-  .calendar-details .info-right {
-    grid-area: right;
-    font-size: 12px;
-    text-align: right;
-  }
+	.calendar-details .info-left {
+		grid-area: left;
+		font-size: 12px;
+	}
+	.calendar-details .info-right {
+		grid-area: right;
+		font-size: 12px;
+		text-align: right;
+	}
 
-  .calendar-details .lunar-hours {
-    grid-area: hours;
-    padding: 10px 0px;
-    font-size: 12px;
-  }
+	.calendar-details .lunar-hours {
+		grid-area: hours;
+		padding: 10px 0px;
+		font-size: 12px;
+	}
 
-  .calendar-details .today-event {
-    grid-area: event;
-    padding: 0px;
-    color: var(--today-event-color);
-    text-align: center;
-  }
+	.calendar-details .today-event {
+		grid-area: event;
+		padding: 0px;
+		color: var(--today-event-color);
+		text-align: center;
+	}
 `;
 /**
  * @typedef {{type: 'SOLAR'|'LUNAR'|number, month: number, day: number, name: string, publicHoliday: boolean }} YearlyEvent
@@ -346,7 +346,6 @@ const DEFAULT_EVENTS = [
 class LunisolarCalendar extends HTMLElement {
 	static observedAttributes = ['initial-date', 'timezone', 'info-hidden'];
 
-	//TODO: timezone attribute
 	constructor() {
 		super(); // always call super() first in the constructor.
 		// Create a shadow root
@@ -357,19 +356,16 @@ class LunisolarCalendar extends HTMLElement {
 		// eslint-disable-next-line wc/no-constructor-attributes
 		const pubDataset = this.querySelectorAll('[slot="public-holidays"] > option');
 		const publicHolidays = [];
-		console.log(pubDataset);
 		if (pubDataset.length) {
 			Array.from(pubDataset).forEach((elem) => {
 				publicHolidays.push(createEvent(elem.value, elem.textContent, true));
 			});
 		}
-		console.log(publicHolidays);
 		const yearlyEvents = DEFAULT_EVENTS.concat(publicHolidays);
 		const findEvents = createFindEvents(yearlyEvents);
 
 		let initialDateFromAttr =
 			this.hasAttribute('initial-date') && new Date(this.getAttribute('initial-date'));
-
 		let selectedDate = isNaN(initialDateFromAttr) ? new Date() : initialDateFromAttr; // display today if initial-date not defined
 
 		// private properties
@@ -487,25 +483,24 @@ class LunisolarCalendar extends HTMLElement {
 	</div>
 	<div class="calendar-details">
 		<div class="solar">
-			<div class="solar-date">22</div>
-			<div class="solar-day">Thứ Hai</div>
+			<div class="solar-date">${today.getDate()}</div>
+			<div class="solar-day">${calWeekDaysFull[today.getDay()]}</div>
 		</div>
 		<div class="info-left">
-			<div class="lunar-year">Năm Quý Mão</div>
-			<div class="lunar-tietkhi">Tiết Đại Hàn</div>
+			<div class="lunar-year">Năm</div>
+			<div class="lunar-tietkhi">Tiết</div>
 		</div>
 		<div class="lunar">
-			<div class="lunar-date">12</div>
-			<div class="lunar-month">Tháng Chạp</div>
+			<div class="lunar-date"></div>
+			<div class="lunar-month">Tháng</div>
 		</div>
 		<div class="info-right">
-			<div class="lunar-month-canchi">Tháng Ất Sửu</div>
-			<div class="lunar-date-canchi">Ngày Ất Dậu</div>
-			<div class="lunar-hour-canchi">Giờ Bính Tý</div>
+			<div class="lunar-month-canchi">Tháng</div>
+			<div class="lunar-date-canchi">Ngày</div>
+			<div class="lunar-hour-canchi">Giờ</div>
 		</div>
 		<div class="lunar-hours">Giờ Hoàng Đạo:</div>
-		<div class="today-event">
-		</div>
+		<div class="today-event"></div>
 	</div>
 	<div class="calendar-body">
 		<div class="calendar-weekdays"></div>
@@ -558,7 +553,13 @@ class LunisolarCalendar extends HTMLElement {
 					html += dateCell(calYear, calMonth, i - firstDayPos, 7);
 				} else {
 					// dates of next month
-					html += dateCell(calYear, calMonth + 1, i - prevAndCurrDaysCount, 7, 'next-dates');
+					html += dateCell(
+						calYear,
+						calMonth + 1,
+						i - prevAndCurrDaysCount,
+						7,
+						'next-dates'
+					);
 				}
 			}
 			wrapper.querySelector('.calendar-dates').innerHTML = html;
@@ -620,19 +621,23 @@ class LunisolarCalendar extends HTMLElement {
 				lunarDayInfo.month,
 				lunarDayInfo.date
 			);
-			console.log(thisDate);
+			// console.log(thisDate);
 			const dateDetails = wrapper.querySelector('.calendar-details');
 			dateDetails.querySelector('.solar-date').textContent = selectedDate.getDate();
-			dateDetails.querySelector('.solar-day').textContent = calWeekDaysFull[selectedDate.getDay()];
+			dateDetails.querySelector('.solar-day').textContent =
+				calWeekDaysFull[selectedDate.getDay()];
 			dateDetails.querySelector('.lunar-month').textContent = lunarDayInfo.monthName;
 
 			dateDetails.querySelector('.lunar-date').textContent = lunarDayInfo.date;
 			dateDetails.querySelector('.lunar-year').textContent = 'Năm ' + lunarDayInfo.year;
 			dateDetails.querySelector('.lunar-month-canchi').textContent =
 				'Tháng ' + lunarDayInfo.ccmonth;
-			dateDetails.querySelector('.lunar-date-canchi').textContent = 'Ngày ' + lunarDayInfo.ccdate;
-			dateDetails.querySelector('.lunar-hour-canchi').textContent = 'Giờ ' + lunarDayInfo.cchour;
-			dateDetails.querySelector('.lunar-tietkhi').textContent = 'Tiết ' + lunarDayInfo.tietkhi;
+			dateDetails.querySelector('.lunar-date-canchi').textContent =
+				'Ngày ' + lunarDayInfo.ccdate;
+			dateDetails.querySelector('.lunar-hour-canchi').textContent =
+				'Giờ ' + lunarDayInfo.cchour;
+			dateDetails.querySelector('.lunar-tietkhi').textContent =
+				'Tiết ' + lunarDayInfo.tietkhi;
 			dateDetails.querySelector('.lunar-hours').innerHTML =
 				'Giờ hoàng đạo: ' + lunarDayInfo.hoangdao;
 			if (thisDate.isPublicHoliday) {
@@ -643,12 +648,16 @@ class LunisolarCalendar extends HTMLElement {
 				dateDetails.querySelector('.solar-day').classList.remove('public-holiday');
 			}
 			if (thisDate.eventNames.length) {
-				dateDetails.querySelector('.today-event').innerHTML = thisDate.eventNames.join('. ');
+				dateDetails.querySelector('.today-event').innerHTML =
+					thisDate.eventNames.join('. ');
 			} else {
 				dateDetails.querySelector('.today-event').innerHTML = '';
 			}
 		}
 
+		/**
+		 * @param {Date} date Target date
+		 */
 		function setSelectedDate(date) {
 			if (date instanceof Date && !isNaN(date)) {
 				selectedDate = date;

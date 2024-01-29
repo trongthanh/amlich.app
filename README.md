@@ -26,7 +26,7 @@ Example:
 
 ## Thanks
 
-- Ho Ngoc Duc for the original [Lunisolar calendar algorithm](https://www.informatik.uni-leipzig.de/~duc/amlich/)
+- Hồ Ngọc Đức for the original [Lunisolar calendar algorithm](https://www.informatik.uni-leipzig.de/~duc/amlich/)
 - Álvaro for the initial [grid-based calendar](https://codepen.io/alvarotrigo/pen/bGLpROa)
 
 ---
