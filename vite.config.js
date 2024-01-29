@@ -6,7 +6,7 @@ export default {
 		minifyTaggedTemplate(), // minify html & css tagged templates
 		VitePWA({
 			registerType: 'autoUpdate',
-			includeAssets: ['app-icon.ico', 'app-icon.png', 'app-icon.svg'],
+			includeAssets: ['favicon.ico', 'app-icon.svg', 'app-icon.png', 'app-icon-256.png'],
 			manifest: {
 				name: 'Âm Lịch PWA',
 				short_name: 'Âm Lịch',
@@ -17,6 +17,11 @@ export default {
 					{
 						src: 'app-icon.png',
 						sizes: '512x512',
+						type: 'image/png',
+					},
+					{
+						src: 'app-icon-256.png',
+						sizes: '256x256',
 						type: 'image/png',
 					},
 				],
