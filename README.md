@@ -7,7 +7,7 @@ Code for <a href="https://amlich.app">applich.app</a> (Lunisolar calendar)
 Example:
 
 ```html
-<lunar-cal timezone="07:00" initial-date="2024-09-02" info-hidden>
+<lunar-cal timezone="07:00" initial-date="2024-09-02" details-visible>
 	<h1>Âm Lịch Việt Nam</h1>
 	<datalist slot="public-holidays">
 		<!-- additional public holidays which are not fixed and dependant on the govement's decision -->
@@ -24,6 +24,7 @@ Example:
 
 These attributes are optional
 
+- `details-visible`: (Boolean attribute) If set, the today's details will be visible.
 - `initial-date`: Initial date and month for the calendar. A Date() parsable string. (Eg: `2024-01-01`, `2025-12-25`)
 - `timezone`: Timezone to calculate the lunar date. (Eg: `7`, `+08:00`, `-05:00`)
 

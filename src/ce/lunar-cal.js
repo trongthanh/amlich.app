@@ -356,7 +356,7 @@ function getTimezone(timeStr) {
 }
 
 class LunisolarCalendar extends HTMLElement {
-	static observedAttributes = ['initial-date', 'timezone', 'info-hidden'];
+	static observedAttributes = ['initial-date', 'timezone', 'details-visible'];
 
 	constructor() {
 		super(); // always call super() first in the constructor.
@@ -384,6 +384,7 @@ class LunisolarCalendar extends HTMLElement {
 		// console.log(selectedDate);
 		let timezone = getTimezone(this.getAttribute('timezone'));
 		// console.log(timezone);
+		let detailsVisible = this.hasAttribute('details-visible');
 
 		// private properties
 		let today = new Date();
@@ -498,16 +499,7 @@ class LunisolarCalendar extends HTMLElement {
 			displayDateInfo();
 		}
 		// prettier-ignore
-		this.html = () => html`<div class="calendar-inner">
-	<div class="calendar-controls">
-		<div class="calendar-prev"><button type="button" aria-label="Previous Month"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><path fill="currentColor" d="M88.2 3.8L35.8 56.23 28 64l7.8 7.78 52.4 52.4 9.78-7.76L45.58 64l52.4-52.4z"/></svg></button></div>
-		<div class="calendar-year-month">
-			<span class="calendar-month-label"></span>
-			<span>-</span>
-			<span class="calendar-year-label"></span>
-		</div>
-		<div class="calendar-next"><button type="button" aria-label="Next Month"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><path fill="currentColor" d="M38.8 124.2l52.4-52.42L99 64l-7.77-7.78-52.4-52.4-9.8 7.77L81.44 64 29 116.42z"/></svg></button></div>
-	</div>
+		const detailsHtml = () => html`
 	<div class="calendar-details">
 		<div class="solar">
 			<div class="solar-date">${today.getDate()}</div>
@@ -529,6 +521,19 @@ class LunisolarCalendar extends HTMLElement {
 		<div class="lunar-hours">Giờ Hoàng Đạo:</div>
 		<div class="today-event"></div>
 	</div>
+		`
+		// prettier-ignore
+		this.html = () => html`<div class="calendar-inner">
+	<div class="calendar-controls">
+		<div class="calendar-prev"><button type="button" aria-label="Previous Month"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><path fill="currentColor" d="M88.2 3.8L35.8 56.23 28 64l7.8 7.78 52.4 52.4 9.78-7.76L45.58 64l52.4-52.4z"/></svg></button></div>
+		<div class="calendar-year-month">
+			<span class="calendar-month-label"></span>
+			<span>-</span>
+			<span class="calendar-year-label"></span>
+		</div>
+		<div class="calendar-next"><button type="button" aria-label="Next Month"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><path fill="currentColor" d="M38.8 124.2l52.4-52.42L99 64l-7.77-7.78-52.4-52.4-9.8 7.77L81.44 64 29 116.42z"/></svg></button></div>
+	</div>
+	${detailsVisible ? detailsHtml() : ''}
 	<div class="calendar-body">
 		<div class="calendar-weekdays"></div>
 		<div class="calendar-dates"></div>
@@ -640,6 +645,10 @@ class LunisolarCalendar extends HTMLElement {
 			}
 		}
 		function displayDateInfo() {
+			const dateDetails = wrapper.querySelector('.calendar-details');
+			if (!detailsVisible || !dateDetails) {
+				return;
+			}
 			const lunarDayInfo = getLunarDayInfo(selectedDate, timezone);
 			const thisDate = findEvents(
 				selectedDate.getFullYear(),
@@ -649,7 +658,6 @@ class LunisolarCalendar extends HTMLElement {
 				lunarDayInfo.date
 			);
 			// console.log(thisDate);
-			const dateDetails = wrapper.querySelector('.calendar-details');
 			dateDetails.querySelector('.solar-date').textContent = selectedDate.getDate();
 			dateDetails.querySelector('.solar-day').textContent =
 				calWeekDaysFull[selectedDate.getDay()];
@@ -704,6 +712,20 @@ class LunisolarCalendar extends HTMLElement {
 			selectDate();
 		}
 
+		function setDetailsVisible(visible) {
+			detailsVisible = visible;
+			const details = wrapper.querySelector('.calendar-details');
+			console.log(visible, details);
+			if (!visible && details) {
+				details.parentElement.removeChild(details);
+			}
+
+			if (visible && !details) {
+				wrapper.innerHTML = this.html();
+				this.init(wrapper);
+			}
+		}
+
 		function init(wrapperElem) {
 			wrapper = this.wrapper = wrapperElem;
 			plotDayNames();
@@ -717,6 +739,7 @@ class LunisolarCalendar extends HTMLElement {
 		this.setTimezone = setTimezone.bind(this);
 		this.setSelectedDate = setSelectedDate.bind(this);
 		this.removeEvents = removeEvents.bind(this);
+		this.setDetailsVisible = setDetailsVisible.bind(this);
 	}
 
 	connectedCallback() {
@@ -742,7 +765,9 @@ class LunisolarCalendar extends HTMLElement {
 		this.removeEvents();
 	}
 
+	// TODO: implement property getter/setter equivalent to these attributes
 	attributeChangedCallback(name, oldVal, newVal) {
+		// console.log(name, typeof oldVal, typeof newVal);
 		if (!this.wrapper) {
 			// initial render, wrapper is not init
 			return;
@@ -752,6 +777,13 @@ class LunisolarCalendar extends HTMLElement {
 		}
 		if (name === 'initial-date' && newVal !== oldVal) {
 			this.setSelectedDate(new Date(newVal));
+		}
+		if (name === 'details-visible' && newVal !== oldVal) {
+			if (typeof newVal === 'string') {
+				this.setDetailsVisible(true);
+			} else {
+				this.setDetailsVisible(false);
+			}
 		}
 	}
 }
