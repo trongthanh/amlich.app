@@ -1,13 +1,13 @@
 # amlich.app
 
-Code for applich.app (Lunasolar calendar)
+Code for <a href="https://amlich.app">applich.app</a> (Lunisolar calendar)
 
 ## `<lunar-cal>` Custom Element
 
 Example:
 
 ```html
-<lunar-cal timezone="7" initial-date="2024-09-03" info-hidden>
+<lunar-cal timezone="07:00" initial-date="2024-09-02" info-hidden>
 	<h1>Âm Lịch Việt Nam</h1>
 	<datalist slot="public-holidays">
 		<!-- additional public holidays which are not fixed and dependant on the govement's decision -->
@@ -22,7 +22,10 @@ Example:
 
 ### Customizable Attributes
 
-- `initial-date`: Initial date and month for the calendar. A Date() parsable string.
+These attributes are optional
+
+- `initial-date`: Initial date and month for the calendar. A Date() parsable string. (Eg: `2024-01-01`, `2025-12-25`)
+- `timezone`: Timezone to calculate the lunar date. (Eg: `7`, `+08:00`, `-05:00`)
 
 ## Thanks
 

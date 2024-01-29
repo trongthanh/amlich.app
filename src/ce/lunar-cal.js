@@ -1,4 +1,4 @@
-// TODO: remove plain-tag
+// Note: this tagged template does nothing, it's just for editor syntax highlighting and minification
 import css from 'plain-tag';
 import html from 'plain-tag';
 
@@ -122,7 +122,7 @@ const styles = css`
 		margin: 3px 0px;
 		background: var(--calendar-current-date-color);
 		padding: 8px 0px;
-		border-radius: 10px;
+		border-radius: 4px;
 		border: 1px solid var(--calendar-current-date-color);
 		color: var(--calendar-font-color);
 		width: 80%;
@@ -343,6 +343,18 @@ const DEFAULT_EVENTS = [
 	createEvent('LUNAR--12-30', '🌸 30 Tháng Chạp 🌸', true),
 ];
 
+/**
+ * Return timezone in hours
+ * @param {string} timeStr time string in format (+|-)HH:MM
+ */
+function getTimezone(timeStr) {
+	const [, sign, hourStr, minuteStr] = /([+-])?(\d{1,2}):?(\d{1,2})?/.exec(timeStr) || [];
+	if (!hourStr) return 0 - new Date().getTimezoneOffset() / 60; // return local timezone if not defined
+	const hour = parseInt(hourStr, 10);
+	const minute = parseInt(minuteStr, 10) || 0;
+	return (sign === '-' ? -1 : 1) * (hour + minute / 60);
+}
+
 class LunisolarCalendar extends HTMLElement {
 	static observedAttributes = ['initial-date', 'timezone', 'info-hidden'];
 
@@ -355,6 +367,7 @@ class LunisolarCalendar extends HTMLElement {
 		// store public holidays
 		// eslint-disable-next-line wc/no-constructor-attributes
 		const pubDataset = this.querySelectorAll('[slot="public-holidays"] > option');
+		// TODO: the slot is not actually used in template, we only use it to define public holidays data
 		const publicHolidays = [];
 		if (pubDataset.length) {
 			Array.from(pubDataset).forEach((elem) => {
@@ -366,10 +379,11 @@ class LunisolarCalendar extends HTMLElement {
 
 		let initialDateFromAttr =
 			this.hasAttribute('initial-date') && new Date(this.getAttribute('initial-date'));
-		console.log(initialDateFromAttr);
 		let selectedDate =
 			!initialDateFromAttr || isNaN(initialDateFromAttr) ? new Date() : initialDateFromAttr; // display today if initial-date not defined
 		// console.log(selectedDate);
+		let timezone = getTimezone(this.getAttribute('timezone'));
+		// console.log(timezone);
 
 		// private properties
 		let today = new Date();
@@ -558,19 +572,19 @@ class LunisolarCalendar extends HTMLElement {
 						prevMonthLastDate.getFullYear(),
 						prevMonthLastDate.getMonth() + 1,
 						prevMonthLastDate.getDate() + i - firstDayPos,
-						7,
+						timezone,
 						'prev-dates'
 					);
 				} else if (i > firstDayPos && i <= prevAndCurrDaysCount) {
 					// dates of current month
-					html += dateCell(calYear, calMonth, i - firstDayPos, 7);
+					html += dateCell(calYear, calMonth, i - firstDayPos, timezone);
 				} else {
 					// dates of next month
 					html += dateCell(
 						calYear,
 						calMonth + 1,
 						i - prevAndCurrDaysCount,
-						7,
+						timezone,
 						'next-dates'
 					);
 				}
@@ -578,9 +592,9 @@ class LunisolarCalendar extends HTMLElement {
 			wrapper.querySelector('.calendar-dates').innerHTML = html;
 			highlightToday();
 		}
-		function dateCell(sy, sm, sd, timeZone, className = 'date-number') {
+		function dateCell(sy, sm, sd, tz, className = 'date-number') {
 			// am lich
-			let [d, m] = convertSolar2Lunar(sd, sm, sy, timeZone);
+			let [d, m] = convertSolar2Lunar(sd, sm, sy, tz);
 			let event = findEvents(sy, sm, sd, m, d);
 			let classes =
 				className +
@@ -626,7 +640,7 @@ class LunisolarCalendar extends HTMLElement {
 			}
 		}
 		function displayDateInfo() {
-			const lunarDayInfo = getLunarDayInfo(selectedDate, 7);
+			const lunarDayInfo = getLunarDayInfo(selectedDate, timezone);
 			const thisDate = findEvents(
 				selectedDate.getFullYear(),
 				selectedDate.getMonth() + 1,
@@ -681,6 +695,15 @@ class LunisolarCalendar extends HTMLElement {
 			throw new RangeError('Invalid initial-date');
 		}
 
+		/**
+		 * @param {string} timezoneStr timezone string in format (+|-)HH:MM
+		 */
+		function setTimezone(timezoneStr) {
+			timezone = getTimezone(timezoneStr);
+			plotDates();
+			selectDate();
+		}
+
 		function init(wrapperElem) {
 			wrapper = this.wrapper = wrapperElem;
 			plotDayNames();
@@ -691,6 +714,7 @@ class LunisolarCalendar extends HTMLElement {
 
 		// public methods:
 		this.init = init.bind(this);
+		this.setTimezone = setTimezone.bind(this);
 		this.setSelectedDate = setSelectedDate.bind(this);
 		this.removeEvents = removeEvents.bind(this);
 	}
@@ -722,6 +746,9 @@ class LunisolarCalendar extends HTMLElement {
 		if (!this.wrapper) {
 			// initial render, wrapper is not init
 			return;
+		}
+		if (name === 'timezone' && newVal !== oldVal) {
+			this.setTimezone(newVal);
 		}
 		if (name === 'initial-date' && newVal !== oldVal) {
 			this.setSelectedDate(new Date(newVal));
