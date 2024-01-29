@@ -366,7 +366,10 @@ class LunisolarCalendar extends HTMLElement {
 
 		let initialDateFromAttr =
 			this.hasAttribute('initial-date') && new Date(this.getAttribute('initial-date'));
-		let selectedDate = isNaN(initialDateFromAttr) ? new Date() : initialDateFromAttr; // display today if initial-date not defined
+		console.log(initialDateFromAttr);
+		let selectedDate =
+			!initialDateFromAttr || isNaN(initialDateFromAttr) ? new Date() : initialDateFromAttr; // display today if initial-date not defined
+		// console.log(selectedDate);
 
 		// private properties
 		let today = new Date();
@@ -450,11 +453,21 @@ class LunisolarCalendar extends HTMLElement {
 			}
 			const nextBtn = e.target.closest('.next-dates');
 			if (nextBtn) {
-				navigateToNextMonth(nextBtn.dataset.num);
+				const targetDate = new Date(
+					selectedDate.getFullYear(),
+					selectedDate.getMonth() + 1,
+					nextBtn.dataset.num
+				);
+				setSelectedDate(targetDate);
 			}
 			const prevBtn = e.target.closest('.prev-dates');
 			if (prevBtn) {
-				navigateToPreviousMonth(prevBtn.dataset.num);
+				const targetDate = new Date(
+					selectedDate.getFullYear(),
+					selectedDate.getMonth() - 1,
+					prevBtn.dataset.num
+				);
+				setSelectedDate(targetDate);
 			}
 		}
 
