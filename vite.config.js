@@ -1,7 +1,9 @@
+import minifyTaggedTemplate from 'rollup-plugin-minify-html-literals';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default {
 	plugins: [
+		minifyTaggedTemplate(), // minify html & css tagged templates
 		VitePWA({
 			registerType: 'autoUpdate',
 			includeAssets: ['app-icon.ico', 'app-icon.png', 'app-icon.svg'],
