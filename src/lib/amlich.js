@@ -234,9 +234,9 @@ function convertLunar2Solar(lunarDay, lunarMonth, lunarYear, lunarLeap, timeZone
 	return jdToDate(monthStart + lunarDay - 1);
 }
 
-// ---------------------------------------------------
+// Below code is from Ho Ngoc Duc's amlich front end ---------------------------------------------------
 /* prettier-ignore */
-const TUAN = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+const TUAN = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
 /* prettier-ignore */
 const THANG = ["Giêng", "Hai", "Ba", "Tư", "Năm", "Sáu", "Bảy", "Tám", "Chín", "Mười", "Mười Một", "Chạp"];
 /* prettier-ignore */
@@ -251,23 +251,22 @@ const TIETKHI = ["Xuân phân", "Thanh minh", "Cốc vũ", "Lập hạ", "Tiểu
 	"Thu phân", "Hàn lộ", "Sương giáng", "Lập đông", "Tiểu tuyết", "Đại tuyết",
 	"Đông chí", "Tiểu hàn", "Đại hàn", "Lập xuân", "Vũ Thủy", "Kinh trập"];
 
-function YearlyEvent(dd, mm, info, emoji) {
+function YearlyEvent(dd, mm, info) {
 	this.day = dd;
 	this.month = mm;
 	this.info = info;
-	this.emoji = emoji;
 }
 
 const YEARLY_EVENTS = new Array(
-	new YearlyEvent(30, 12, '30 Tháng Chạp', '🌸'),
-	new YearlyEvent(1, 1, 'Mùng 1 Tết Nguyên Đán', '🌸'),
-	new YearlyEvent(15, 1, 'Rằm tháng Giêng', '🌕'),
-	new YearlyEvent(10, 3, 'Giỗ Tổ Hùng Vương (10/3 ÂL)', '🙏'),
-	new YearlyEvent(15, 4, 'Phật Đản (15/4 ÂL)', '🪷'),
-	new YearlyEvent(5, 5, 'Lễ Đoan Ngọ (5/5 ÂL)', '🌾'),
-	new YearlyEvent(15, 7, 'Vu Lan (15/7 ÂL)', '🕯️'),
-	new YearlyEvent(15, 8, 'Tết Trung Thu (Rằm tháng 8)', '🥮'),
-	new YearlyEvent(23, 12, 'Ông Táo chầu trời (23/12 ÂL)', '🍚')
+	new YearlyEvent(30, 12, '30 Tháng Chạp'),
+	new YearlyEvent(1, 1, 'Mùng 1 Tết Nguyên Đán'),
+	new YearlyEvent(15, 1, 'Rằm tháng Giêng'),
+	new YearlyEvent(10, 3, 'Giỗ Tổ Hùng Vương (10/3 ÂL)'),
+	new YearlyEvent(15, 4, 'Phật Đản (15/4 ÂL)'),
+	new YearlyEvent(5, 5, 'Lễ Đoan Ngọ (5/5 ÂL)'),
+	new YearlyEvent(15, 7, 'Vu Lan (15/7 ÂL)'),
+	new YearlyEvent(15, 8, 'Tết Trung Thu (Rằm tháng 8)'),
+	new YearlyEvent(23, 12, 'Ông Táo chầu trời (23/12 ÂL)')
 );
 
 /**
@@ -297,7 +296,7 @@ function getEventInfo(dd, mm) {
 	const events = findEvents(dd, mm);
 	let ret = '';
 	for (let i = 0; i < events.length; i++) {
-		ret += events[i].emoji + ' ' + events[i].info + ' ' + events[i].emoji;
+		ret += events[i].info;
 	}
 	return ret;
 }

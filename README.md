@@ -28,10 +28,22 @@ These attributes are optional
 - `initial-date`: Initial date and month for the calendar. A Date() parsable string. (Eg: `2024-01-01`, `2025-12-25`)
 - `timezone`: Timezone to calculate the lunar date. (Eg: `7`, `+08:00`, `-05:00`)
 
+## Features and Road map
+
+- [x] Monthly view Lunisolar calendar
+- [x] Details view of today and selected date
+- [x] `<lunar-cal>` custom element (Web component)
+- [x] Installable PWA
+- [ ] Customization demo
+- [ ] npm package
+- [ ] JS API documentation
+- [ ] Unit tests
+- [ ] Clean code
+
 ## Thanks
 
 - Hồ Ngọc Đức for the original [Lunisolar calendar algorithm](https://www.informatik.uni-leipzig.de/~duc/amlich/)
 - Álvaro for the initial [grid-based calendar](https://codepen.io/alvarotrigo/pen/bGLpROa)
 
 ---
-© Copyright 2024 Tran Trong Thanh (int3ractive.com)
+© 2024 Trần Trọng Thanh (int3ractive.com). Apache 2.0 license.
