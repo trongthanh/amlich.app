@@ -7,25 +7,52 @@ import { convertSolar2Lunar, getLunarDayInfo } from '../lib/amlich.js';
 const styles = css`
 	:host {
 		font-size: 16px;
-
-		--calendar-bg-color: #262829;
-		--calendar-font-color: #fff;
-		--weekdays-border-bottom-color: #404040;
-		--calendar-date-hover-color: #505050;
-		--calendar-current-date-color: #1b1f21;
-		--calendar-today-color: linear-gradient(to bottom, #03a9f4, #2196f3);
-		--calendar-today-innerborder-color: transparent;
+		--calendar-bg-color: #f3f4f6;
+		--calendar-font-color: #1f2937;
+		--weekdays-border-bottom-color: #cbd5e1;
+		--calendar-date-hover-color: #9ca3af;
+		--calendar-current-date-color: #d1d5db;
+		--calendar-today-color: #dc2626;
 		--calendar-nextprev-bg-color: transparent;
-		--calendar-prevnext-date-color: #484848;
-		--calendar-arrow-color: #fff;
+		--calendar-prevnext-date-color: #9ca3af;
+		--calendar-arrow-color: #1f2937;
 		--calendar-border-radius: 16px;
-		--calendar-selected-border-color: #fff;
-		--calendar-active-bg-color: #505050;
-		--calendar-weekend-color: #22c55e;
-		--lunar-date-color: #facc15;
+		--calendar-selected-bg-color: linear-gradient(to bottom, #93c5fd, #60a5fa);
+		--calendar-active-bg-color: #e5e7eb;
+		--calendar-weekend-color: #15803d;
+		--lunar-date-color: #d97706;
 		--lunar-date-event-color: #dc2626;
-		--today-event-color: #fca5a5;
+		--today-event-color: #991b1b;
 		--public-holiday-color: #dc2626;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		:host {
+			--calendar-bg-color: #262829;
+			--calendar-font-color: #fff;
+			--weekdays-border-bottom-color: #404040;
+			--calendar-date-hover-color: #505050;
+			--calendar-current-date-color: #1b1f21;
+			--calendar-today-color: #f87171;
+			--calendar-nextprev-bg-color: transparent;
+			--calendar-prevnext-date-color: #484848;
+			--calendar-arrow-color: #fff;
+			--calendar-border-radius: 16px;
+			--calendar-selected-bg-color: linear-gradient(to bottom, #03a9f4, #2196f3);
+			--calendar-active-bg-color: #505050;
+			--calendar-weekend-color: #22c55e;
+			--lunar-date-color: #facc15;
+			--lunar-date-event-color: #dc2626;
+			--today-event-color: #fca5a5;
+			--public-holiday-color: #dc2626;
+		}
+		.date-number.lunar-event .lunar-date {
+			font-weight: 700;
+		}
+
+		.date-number.public-holiday .solar-date {
+			font-weight: 700;
+		}
 	}
 
 	* {
@@ -56,7 +83,7 @@ const styles = css`
 		display: grid;
 		grid-template-columns: repeat(7, 1fr);
 		text-align: center;
-		line-height: 1.3;
+		line-height: 1.4;
 	}
 
 	.calendar-weekdays > div {
@@ -82,6 +109,7 @@ const styles = css`
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
+		align-items: center;
 		margin: 2px;
 	}
 
@@ -94,16 +122,14 @@ const styles = css`
 		background: var(--calendar-active-bg-color);
 	}
 	.date-number.selected {
-		border: 1px solid var(--calendar-selected-border-color);
+		background: var(--calendar-selected-bg-color);
 	}
 	.date-number.lunar-event .lunar-date {
 		color: var(--lunar-date-event-color);
-		font-weight: 700;
 	}
 
 	.date-number.public-holiday .solar-date {
 		color: var(--public-holiday-color);
-		font-weight: 700;
 	}
 
 	.empty-dates:hover {
@@ -154,12 +180,23 @@ const styles = css`
 		font-size: 20px;
 	}
 
-	.calendar-body .calendar-today {
-		background: var(--calendar-today-color);
+	.calendar-today .solar-date {
+		position: relative;
+		z-index: 0;
+		color: var(--calendar-bg-color);
 	}
-
-	.calendar-body .calendar-today.selected {
-		border: 1px solid transparent;
+	/* draw a red circle around today's date */
+	.calendar-today .solar-date::before {
+		aspect-ratio: 1 / 1;
+		display: block;
+		content: '';
+		background: var(--calendar-today-color);
+		position: absolute;
+		height: 100%;
+		margin: 0 50%;
+		border-radius: 16px;
+		z-index: -1;
+		transform: translate(-50%, 0);
 	}
 
 	/* next & previous buttons */
@@ -172,6 +209,7 @@ const styles = css`
 		display: inline-block;
 		background: var(--calendar-nextprev-bg-color);
 		border: 1px solid transparent;
+		border-radius: 4px;
 		cursor: pointer;
 	}
 	.calendar-controls button:hover {
@@ -214,11 +252,28 @@ const styles = css`
 		grid-template-rows: auto;
 		gap: 0px 0px;
 		grid-template-areas:
-			'. solar .'
+			'today solar .'
 			'left lunar right'
 			'hours hours hours'
 			'event event event';
 		font-size: 14px;
+	}
+
+	.calendar-details .today-badge {
+		grid-area: today;
+		display: none;
+	}
+
+	.calendar-details .today-badge.visible {
+		display: block;
+	}
+	.calendar-details .today-badge span {
+		margin-top: 4px;
+		padding: 2px 4px;
+		display: inline-block;
+		border-radius: 16px;
+		color: var(--calendar-bg-color);
+		background: var(--calendar-today-color);
 	}
 
 	.calendar-details .solar {
@@ -505,6 +560,7 @@ class LunisolarCalendar extends HTMLElement {
 			<div class="solar-date">${today.getDate()}</div>
 			<div class="solar-day">${calWeekDaysFull[today.getDay()]}</div>
 		</div>
+		<div class="today-badge"><span>Hôm Nay</span></div>
 		<div class="info-left">
 			<div class="lunar-year">Năm</div>
 			<div class="lunar-tietkhi">Tiết</div>
@@ -649,6 +705,7 @@ class LunisolarCalendar extends HTMLElement {
 			if (!detailsVisible || !dateDetails) {
 				return;
 			}
+			const isToday = selectedDate.toDateString() === today.toDateString();
 			const lunarDayInfo = getLunarDayInfo(selectedDate, timezone);
 			const thisDate = findEvents(
 				selectedDate.getFullYear(),
@@ -687,6 +744,11 @@ class LunisolarCalendar extends HTMLElement {
 					thisDate.eventNames.join('. ');
 			} else {
 				dateDetails.querySelector('.today-event').innerHTML = '';
+			}
+			if (isToday) {
+				dateDetails.querySelector('.today-badge').classList.add('visible');
+			} else {
+				dateDetails.querySelector('.today-badge').classList.remove('visible');
 			}
 		}
 

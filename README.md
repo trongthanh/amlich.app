@@ -34,6 +34,7 @@ These attributes are optional
 - [x] Details view of today and selected date
 - [x] `<lunar-cal>` custom element (Web component)
 - [x] Installable PWA
+- [x] `prefer-color-scheme` for dark and light mode
 - [ ] Customization demo
 - [ ] npm package
 - [ ] JS API documentation
