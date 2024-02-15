@@ -433,15 +433,19 @@ class LunisolarCalendar extends HTMLElement {
 		const findEvents = createFindEvents(yearlyEvents);
 
 		let initialDateFromAttr =
+			// eslint-disable-next-line wc/no-constructor-attributes
 			this.hasAttribute('initial-date') && new Date(this.getAttribute('initial-date'));
 		let selectedDate =
 			!initialDateFromAttr || isNaN(initialDateFromAttr) ? new Date() : initialDateFromAttr; // display today if initial-date not defined
 		// console.log(selectedDate);
+		// eslint-disable-next-line wc/no-constructor-attributes
 		let timezone = getTimezone(this.getAttribute('timezone'));
 		// console.log(timezone);
+		// eslint-disable-next-line wc/no-constructor-attributes
 		let detailsVisible = this.hasAttribute('details-visible');
 
 		// private properties
+		// NOTE: I'm avoiding using private fields (#) for better compatibility
 		let today = new Date();
 		let calWeekDays = ['CN', 'Hai', 'Ba', 'Tư', 'Năm', 'Sáu', 'Bảy'];
 		// prettier-ignore
@@ -696,7 +700,7 @@ class LunisolarCalendar extends HTMLElement {
 			if (currentYear === changedYear && currentMonth === changedMonth) {
 				wrapper
 					.querySelectorAll('.date-number')
-				[today.getDate() - 1].classList.add('calendar-today');
+					[today.getDate() - 1].classList.add('calendar-today');
 				selectDate();
 			}
 		}

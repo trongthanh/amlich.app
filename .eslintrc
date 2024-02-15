@@ -1,13 +1,10 @@
 {
-	"extends": [
-		"eslint:recommended",
-		"plugin:wc/best-practice"
-	],
+	"extends": ["eslint:recommended", "plugin:wc/best-practice"],
 	"parserOptions": {
-		"ecmaVersion": "2020",
 		"sourceType": "module"
 	},
 	"env": {
+		"es2022": true,
 		"browser": true
 	},
 	"rules": {
