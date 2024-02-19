@@ -792,12 +792,29 @@ class LunisolarCalendar extends HTMLElement {
 			}
 		}
 
+		function updateToday() {
+			console.log('Updating Today:', today.toDateString());
+			plotDates();
+			selectDate();
+			wrapper.querySelector('.calendar-today-date').textContent = `Hôm nay: ${
+				calWeekDaysFull[today.getDay()]
+			}, ${today.getDate()} ${calMonthName[today.getMonth()]} ${today.getFullYear()}`;
+		}
+
 		function init(wrapperElem) {
 			wrapper = this.wrapper = wrapperElem;
 			plotDayNames();
 			plotDates();
 			selectDate();
 			attachEvents();
+
+			setInterval(() => {
+				const newToday = new Date();
+				if (newToday.toDateString() !== today.toDateString()) {
+					today = newToday;
+					updateToday();
+				}
+			}, 2000); // don't need to be second accurate
 		}
 
 		// public methods:
