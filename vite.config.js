@@ -2,6 +2,11 @@ import minifyTaggedTemplate from 'rollup-plugin-minify-html-literals';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default {
+	root: 'src/',
+	publicDir: '../public/',
+	build: {
+		outDir: '../dist/',
+	},
 	plugins: [
 		minifyTaggedTemplate(), // minify html & css tagged templates
 		VitePWA({
