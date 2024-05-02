@@ -1,14 +1,49 @@
+/* eslint-env node */
+import path from 'path';
 import minifyTaggedTemplate from 'rollup-plugin-minify-html-literals';
 import { VitePWA } from 'vite-plugin-pwa';
+import commonjs from '@rollup/plugin-commonjs';
+import copy from 'rollup-plugin-copy';
+// import css from 'rollup-plugin-css-only';
+import resolve from '@rollup/plugin-node-resolve';
 
+/** @type {import('vite').UserConfig} */
 export default {
 	root: 'src/',
 	publicDir: '../public/',
 	build: {
 		outDir: '../dist/',
+		rollupOptions: {
+			input: {
+				// relative to vite.config.js
+				main: 'src/index.html',
+				wallpaperMaker: 'src/wallpaper-maker/index.html',
+			},
+		},
 	},
 	plugins: [
+		resolve(),
+		commonjs(),
+		// Bundle styles into dist/bundle.css
+		// css({
+		// 	output: 'bundle.css',
+		// }),
+		// Copy Shoelace assets to public/assets/ once so they can be accessed
+		// from both `vite` and `vite preview`
+		copy({
+			copyOnce: true,
+			targets: [
+				{
+					src: path.resolve(
+						__dirname,
+						'node_modules/@shoelace-style/shoelace/dist/assets/icons/'
+					),
+					dest: path.resolve(__dirname, 'public/assets/'),
+				},
+			],
+		}),
 		minifyTaggedTemplate(), // minify html & css tagged templates
+		// TODO: register for root index.html ONLY
 		VitePWA({
 			registerType: 'autoUpdate',
 			includeAssets: ['favicon.ico', 'app-icon.svg', 'app-icon.png', 'app-icon-maskable.png'],

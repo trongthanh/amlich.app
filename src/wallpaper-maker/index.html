@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="vi">
+<head>
+	<title>Âm Lịch Việt Nam - Vietnamese Lunisolar Calendar PWA</title>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Calendar Wallpaper maker" />
+	<meta property="og:image" content="https://amlich.app/thumbnail.png" />
+	<link rel="icon" href="/favicon.ico" sizes="16x16" />
+	<link rel="icon" href="/app-icon.svg" type="image/svg+xml" />
+	<link rel="apple-touch-icon" href="/app-icon.png" />
+	<meta name="theme-color" content="#212121" />
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+	<link href="/css/simple.css" rel="stylesheet" />
+	<script type="module">
+		// TODO: look into source map warnings
+		// Import custom elements
+		import '@shoelace-style/shoelace/dist/themes/light.css';
+		import '@shoelace-style/shoelace/dist/themes/dark.css';
+		import '@shoelace-style/shoelace/dist/components/button/button.js';
+		import '@shoelace-style/shoelace/dist/components/icon/icon.js';
+		import '@shoelace-style/shoelace/dist/components/input/input.js';
+		import '@shoelace-style/shoelace/dist/components/rating/rating.js';
+		import '@shoelace-style/shoelace/dist/components/alert/alert.js';
+		import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
+
+		// Set the base path to the folder you copied Shoelace's assets to
+		setBasePath('/');
+	</script>
+	<script type="module" src="wallpaper-maker.js"></script>
+</head>
+
+<body>
+	<div>
+		<nav>
+			<a href="/">Âm Lịch</a>
+			<a href="/wallpaper-maker/">Wallpaper Maker</a>
+		</nav>
+	</div>
+	<main>
+		<p>
+			<sl-button id="myButton">Click me</sl-button>
+		</p>
+		<p>
+			<sl-alert open>
+			  <sl-icon slot="icon" name="info-circle"></sl-icon>
+				This is a standard alert. You can customize its content and even the icon.
+			</sl-alert>
+		</p>
+	</main>
+	<footer>
+		© 2024 <a href="https://int3ractive.com">Trần Trọng Thanh</a>. Built in Sài Gòn.
+		<a href="https://github.com/trongthanh/amlich.app">Open source at Github</a>.
+	</footer>
+</body>
+</html>
