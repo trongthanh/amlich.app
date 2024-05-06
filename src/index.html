@@ -13,12 +13,13 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-	<link href="css/simple.css" rel="stylesheet" />
+	<link href="/css/base.css" rel="stylesheet" />
+	<link href="/css/index.css" rel="stylesheet" />
 	<script type="module" src="ce/lunar-cal.js"></script>
 </head>
 
 <body>
-	<main>
+	<main class="container mx-auto">
 		<lunar-cal details-visible>
 			<h1>Âm Lịch Việt Nam</h1>
 			<datalist slot="public-holidays">
@@ -30,18 +31,24 @@
 				<option value="SOLAR--12-25">🎄 Lễ Giáng Sinh 🎄</option>
 			</datalist>
 		</lunar-cal>
+	</main>
+	<section class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
 		<p>More Tools:</p>
 		<ul>
-			<li><a href="./wallpaper-maker/">Calender Wallpaper Maker</a></li>
+			<li><a href="./wallpaper-maker/?new">Calender Wallpaper Maker</a></li>
 		</ul>
-	</main>
-	<footer>
-		Một phiên bản hiện đại của
-		<a href="https://www.informatik.uni-leipzig.de/~duc/amlich/" rel="noopener noreferrer">website Âm Lịch</a>
-		bởi Hồ Ngọc Đức. <br />
-		© 2024 <a href="https://int3ractive.com">Trần Trọng Thanh</a>.
-		<code>&lt;lunar-cal&gt;</code>
-		<a href="https://github.com/trongthanh/amlich.app">code and documentation</a>. Built in Sài Gòn with ❤️.
+	</section>
+	<hr>
+	<footer class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+		<p>
+			Một phiên bản hiện đại của
+			<a href="https://www.informatik.uni-leipzig.de/~duc/amlich/" rel="noopener noreferrer">website Âm Lịch</a>
+			bởi Hồ Ngọc Đức.<br />
+			© 2024 <a href="https://int3ractive.com">Trần Trọng Thanh</a>.
+			<code>&lt;lunar-cal&gt;</code>
+			<a href="https://github.com/trongthanh/amlich.app">code and documentation</a>.
+			Built in Sài Gòn with ❤️.
+		</p>
 	</footer>
 </body>
 </html>
