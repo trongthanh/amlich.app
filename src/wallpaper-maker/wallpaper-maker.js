@@ -1,3 +1,7 @@
+const sidebar = document.querySelector('#sidebar');
+const closeButton = sidebar.querySelector('sl-button[variant="primary"]');
 document.querySelector('#myButton').addEventListener('click', () => {
-	alert('Hello, Shoelace!');
+	sidebar.show();
 });
+
+closeButton.addEventListener('click', () => sidebar.hide());

@@ -34,11 +34,16 @@ export default {
 			copyOnce: true,
 			targets: [
 				{
-					src: path.resolve(
-						__dirname,
-						'node_modules/@shoelace-style/shoelace/dist/assets/icons/'
-					),
+					src: path.resolve(__dirname, 'node_modules/@shoelace-style/shoelace/dist/assets/icons/'),
 					dest: path.resolve(__dirname, 'public/assets/'),
+				},
+				{
+					src: path.resolve(__dirname, 'node_modules/@shoelace-style/shoelace/dist/themes/light.css'),
+					dest: path.resolve(__dirname, 'public/css/shoelace/'),
+				},
+				{
+					src: path.resolve(__dirname, 'node_modules/@shoelace-style/shoelace/dist/themes/dark.css'),
+					dest: path.resolve(__dirname, 'public/css/shoelace/'),
 				},
 			],
 		}),
