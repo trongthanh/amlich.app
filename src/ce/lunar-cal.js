@@ -435,8 +435,7 @@ class LunisolarCalendar extends HTMLElement {
 		let initialDateFromAttr =
 			// eslint-disable-next-line wc/no-constructor-attributes
 			this.hasAttribute('initial-date') && new Date(this.getAttribute('initial-date'));
-		let selectedDate =
-			!initialDateFromAttr || isNaN(initialDateFromAttr) ? new Date() : initialDateFromAttr; // display today if initial-date not defined
+		let selectedDate = !initialDateFromAttr || isNaN(initialDateFromAttr) ? new Date() : initialDateFromAttr; // display today if initial-date not defined
 		// console.log(selectedDate);
 		// eslint-disable-next-line wc/no-constructor-attributes
 		let timezone = getTimezone(this.getAttribute('timezone'));
@@ -645,13 +644,7 @@ class LunisolarCalendar extends HTMLElement {
 					html += dateCell(calYear, calMonth, i - firstDayPos, timezone);
 				} else {
 					// dates of next month
-					html += dateCell(
-						calYear,
-						calMonth + 1,
-						i - prevAndCurrDaysCount,
-						timezone,
-						'next-dates'
-					);
+					html += dateCell(calYear, calMonth + 1, i - prevAndCurrDaysCount, timezone, 'next-dates');
 				}
 			}
 			wrapper.querySelector('.calendar-dates').innerHTML = html;
@@ -665,8 +658,7 @@ class LunisolarCalendar extends HTMLElement {
 				className +
 				(event.isLunarEvent ? ' lunar-event' : '') +
 				(event.isSolarEvent || event.isPublicHoliday ? ' public-holiday' : '');
-			const lunarDateStr =
-				d === 1 || sd === 1 ? `${d}/${m}` : d === 15 ? `${d} <small>🌕</small>` : `${d}`;
+			const lunarDateStr = d === 1 || sd === 1 ? `${d}/${m}` : d === 15 ? `${d} <small>🌕</small>` : `${d}`;
 
 			const html = `<a class="${classes}" data-num=${sd} href="#${sy}-${sm}-${sd}"><div class="solar-date">${sd}</div><span class="lunar-date">${lunarDateStr}</span></a>`;
 			return html;
@@ -698,9 +690,7 @@ class LunisolarCalendar extends HTMLElement {
 			let currentYear = today.getFullYear();
 			let changedYear = selectedDate.getFullYear();
 			if (currentYear === changedYear && currentMonth === changedMonth) {
-				wrapper
-					.querySelectorAll('.date-number')
-					[today.getDate() - 1].classList.add('calendar-today');
+				wrapper.querySelectorAll('.date-number')[today.getDate() - 1].classList.add('calendar-today');
 				selectDate();
 			}
 		}
@@ -720,22 +710,16 @@ class LunisolarCalendar extends HTMLElement {
 			);
 			// console.log(thisDate);
 			dateDetails.querySelector('.solar-date').textContent = selectedDate.getDate();
-			dateDetails.querySelector('.solar-day').textContent =
-				calWeekDaysFull[selectedDate.getDay()];
+			dateDetails.querySelector('.solar-day').textContent = calWeekDaysFull[selectedDate.getDay()];
 			dateDetails.querySelector('.lunar-month').textContent = lunarDayInfo.monthName;
 
 			dateDetails.querySelector('.lunar-date').textContent = lunarDayInfo.date;
 			dateDetails.querySelector('.lunar-year').textContent = 'Năm ' + lunarDayInfo.year;
-			dateDetails.querySelector('.lunar-month-canchi').textContent =
-				'Tháng ' + lunarDayInfo.ccmonth;
-			dateDetails.querySelector('.lunar-date-canchi').textContent =
-				'Ngày ' + lunarDayInfo.ccdate;
-			dateDetails.querySelector('.lunar-hour-canchi').textContent =
-				'Giờ ' + lunarDayInfo.cchour;
-			dateDetails.querySelector('.lunar-tietkhi').textContent =
-				'Tiết ' + lunarDayInfo.tietkhi;
-			dateDetails.querySelector('.lunar-hours').innerHTML =
-				'Giờ hoàng đạo: ' + lunarDayInfo.hoangdao;
+			dateDetails.querySelector('.lunar-month-canchi').textContent = 'Tháng ' + lunarDayInfo.ccmonth;
+			dateDetails.querySelector('.lunar-date-canchi').textContent = 'Ngày ' + lunarDayInfo.ccdate;
+			dateDetails.querySelector('.lunar-hour-canchi').textContent = 'Giờ ' + lunarDayInfo.cchour;
+			dateDetails.querySelector('.lunar-tietkhi').textContent = 'Tiết ' + lunarDayInfo.tietkhi;
+			dateDetails.querySelector('.lunar-hours').innerHTML = 'Giờ hoàng đạo: ' + lunarDayInfo.hoangdao;
 			if (thisDate.isPublicHoliday) {
 				dateDetails.querySelector('.solar-date').classList.add('public-holiday');
 				dateDetails.querySelector('.solar-day').classList.add('public-holiday');
@@ -744,8 +728,7 @@ class LunisolarCalendar extends HTMLElement {
 				dateDetails.querySelector('.solar-day').classList.remove('public-holiday');
 			}
 			if (thisDate.eventNames.length) {
-				dateDetails.querySelector('.today-event').innerHTML =
-					thisDate.eventNames.join('. ');
+				dateDetails.querySelector('.today-event').innerHTML = thisDate.eventNames.join('. ');
 			} else {
 				dateDetails.querySelector('.today-event').innerHTML = '';
 			}
