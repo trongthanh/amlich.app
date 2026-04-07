@@ -21,6 +21,8 @@
 		<script type="module">
 			// TODO: look into source map warnings
 			// Import custom elements
+			import '../ce/wallpaper-display.js';
+			import '../ce/cal-display.js';
 			import '@shoelace-style/shoelace/dist/components/button/button.js';
 			import '@shoelace-style/shoelace/dist/components/icon/icon.js';
 			import '@shoelace-style/shoelace/dist/components/input/input.js';
@@ -34,13 +36,13 @@
 		<script type="module" src="wallpaper-maker.js"></script>
 	</head>
 
-	<body>
-		<header class="bg-white">
-			<nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+	<body class="pt-16">
+		<header class="fixed top-0 w-full z-10">
+			<nav class="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8" aria-label="Global">
 				<div class="flex lg:flex-1">
 					<a href="/" class="-m-1.5 p-1.5">
 						<span class="sr-only">Your Company</span>
-						<img class="h-8 w-auto" src="https://amlich.app/app-icon.svg" alt="" />
+						<img class="h-8 w-auto" src="https://amlich.app/app-icon.svg" height="32" alt="" />
 					</a>
 				</div>
 
@@ -49,35 +51,32 @@
 						>Wallpaper Maker</a
 					>
 				</div>
-				<div class="hidden lg:flex lg:flex-1 lg:justify-end">
-					<a href="https://int3ractive.com" class="text-sm font-semibold leading-6 text-gray-900"
-						>Int3ractive.com</a
-					>
+				<div class="flex lg:flex-1 lg:justify-end">
+					<sl-button id="drawerButton">Click me</sl-button>
 				</div>
 			</nav>
 		</header>
 
-		<sl-drawer id="sidebar" label="Tools" placement="start" class="drawer-placement-start">
+		<sl-drawer id="sidebar" label="Tools" placement="end" class="drawer-placement-start">
 			This drawer slides in from the start.
 			<sl-button slot="footer" variant="primary">Close</sl-button>
 		</sl-drawer>
-		<main>
-			<p>
-				<sl-button id="myButton">Click me</sl-button>
-			</p>
-			<p>
-				<sl-alert open>
-					<sl-icon slot="icon" name="info-circle"></sl-icon>
-					This is a standard alert. You can customize its content and even the icon.
-				</sl-alert>
-			</p>
-		</main>
-		<footer class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
-			<div>
-				<img class="align-middle" src="https://int3ractive.com/images/favicon.png" height="32" />
-				© 2024 <a href="https://int3ractive.com">Trần Trọng Thanh</a>. Built in Sài Gòn.
+		<main class="mx-auto">
+			<cal-display month="4" year="2024" start-week-on="mon"></cal-display>
+			<div class="w-full h-lvh">
+				<wallpaper-display></wallpaper-display>
 			</div>
-			<a href="https://github.com/trongthanh/amlich.app" class="text-black"><sl-icon name="github"></sl-icon></a>
+		</main>
+		<footer class="fixed bottom-0 w-full">
+			<div class="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8">
+				<div>
+					<img class="align-middle size-8" src="https://int3ractive.com/images/favicon.png" height="32" />
+					© 2024 <a href="https://int3ractive.com">Trần Trọng Thanh</a>. Built in Sài Gòn.
+				</div>
+				<a href="https://github.com/trongthanh/amlich.app"
+					><sl-icon name="github" class="text-3xl text-black hover:text-blue-400"></sl-icon
+				></a>
+			</div>
 		</footer>
 	</body>
 </html>
