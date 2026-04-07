@@ -1,6 +1,0 @@
-name = "amlich-app"
-pages_build_output_dir = "dist"
-compatibility_date = "2026-04-07"
-
-[build]
-command = "pnpm build"
