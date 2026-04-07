@@ -13,6 +13,7 @@ export default {
 	publicDir: '../public/',
 	build: {
 		outDir: '../dist/',
+		emptyOutDir: true,
 		rollupOptions: {
 			input: {
 				// relative to vite.config.js
@@ -47,7 +48,7 @@ export default {
 				},
 			],
 		}),
-		minifyTaggedTemplate(), // minify html & css tagged templates
+		minifyTaggedTemplate({ filter: (id) => !id.includes('node_modules') }), // minify html & css tagged templates
 		// TODO: register for root index.html ONLY
 		VitePWA({
 			registerType: 'autoUpdate',
