@@ -21,22 +21,11 @@ Test the calendar output locally:
 pnpm test
 
 # Or simulate curl output directly:
-node --input-type=module <<'EOF'
-import { renderCalendar } from './src/lib/cli-calendar.js';
-
-// Render current month with today highlighted
-const now = new Date();
-const calendar = renderCalendar(now, false);  // false = plain text (no ANSI)
-console.log(calendar);
-
-// Specific date
-const date = new Date(2026, 3, 8);  // April 8, 2026
-const calAnsi = renderCalendar(date, true);  // true = ANSI colors
-console.log(calAnsi);
-EOF
+./testcli.sh
 ```
 
 **Deploy to production:**
+
 ```bash
 git push origin main  # Cloudflare Pages auto-deploys; curl amlich.app works immediately
 ```
@@ -80,7 +69,7 @@ These attributes are optional
 - [x] `<lunar-cal>` custom element (Web component)
 - [x] Installable PWA
 - [x] `prefer-color-scheme` for dark and light mode
-- [x] `curl amlich.app` — ANSI/plain-text calendar in terminal (like wttr.in)
+- [x] `curl amlich.app` — ANSI/markdown calendar in terminal (like wttr.in)
 - [ ] Customization demo
 - [ ] npm package
 - [ ] JS API documentation
@@ -93,4 +82,4 @@ These attributes are optional
 - Kev Quirk for [Simple CSS](https://github.com/kevquirk/simple.css)
 
 ---
-© 2024 Trần Trọng Thanh (int3ractive.com). Apache 2.0 license.
+© 2026 Trần Trọng Thanh (thanh.im). Apache 2.0 license.

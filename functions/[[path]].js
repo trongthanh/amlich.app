@@ -1,4 +1,4 @@
-import { renderCalendar, getVietnamNow } from '../src/lib/cli-calendar.js';
+import { renderCalendar, renderCalendarMarkdown, getVietnamNow } from '../src/lib/cli-calendar.js';
 
 function isBrowserRequest(request) {
 	const ua = (request.headers.get('User-Agent') || '').toLowerCase();
@@ -18,6 +18,11 @@ function isCurlRequest(request) {
 	return (request.headers.get('User-Agent') || '').toLowerCase().startsWith('curl/');
 }
 
+function acceptsMarkdown(request) {
+	const accept = request.headers.get('Accept') || '';
+	return accept.includes('text/markdown') || accept.includes('application/markdown');
+}
+
 export async function onRequest(context) {
 	const { request, env, params } = context;
 
@@ -34,7 +39,7 @@ export async function onRequest(context) {
 		const parsed = new Date(pathStr);
 		targetDate = isNaN(parsed) ? null : parsed;
 		if (!targetDate) {
-			return new Response('Invalid date. Use format: curl amlich.app/YYYY-MM-DD\n', {
+			return new Response('Invalid date. Use format: curl -L amlich.app/YYYY-MM-DD\n', {
 				status: 400,
 				headers: { 'Content-Type': 'text/plain; charset=utf-8' },
 			});
@@ -45,10 +50,21 @@ export async function onRequest(context) {
 		targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 	}
 
-	const useAnsi = isCurlRequest(request);
-	const body = renderCalendar(targetDate, useAnsi);
+	let body;
+	let contentType;
+
+	const showFooter = !!pathStr;
+
+	if (acceptsMarkdown(request)) {
+		body = renderCalendarMarkdown(targetDate, undefined, showFooter);
+		contentType = 'text/markdown; charset=utf-8';
+	} else {
+		const useAnsi = isCurlRequest(request);
+		body = renderCalendar(targetDate, useAnsi, undefined, showFooter);
+		contentType = 'text/plain; charset=utf-8';
+	}
 
 	return new Response(body, {
-		headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+		headers: { 'Content-Type': contentType },
 	});
 }

@@ -1,84 +1,80 @@
 <!doctype html>
 <html lang="vi">
-  <head>
-    <title>Âm Lịch Việt Nam - Vietnamese Lunisolar Calendar PWA</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="Âm Lịch Việt Nam Progressive Web App, phát triển bởi Trần Trọng Thanh, dựa trên thuật toán tính Âm Lịch của Hồ Ngọc Đức."
-    />
-    <meta property="og:image" content="https://amlich.app/thumbnail.png" />
-    <link rel="icon" href="/favicon.ico" sizes="16x16" />
-    <link rel="icon" href="/app-icon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/app-icon.png" />
-    <meta name="theme-color" content="#212121" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link href="/css/base.css" rel="stylesheet" />
-    <link href="/css/index.css" rel="stylesheet" />
-    <script type="module" src="ce/lunar-cal.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css"
-    />
-    <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
-    <df-messenger
-      project-id="chotot-agent-mljvyb"
-      agent-id="84e170b2-cc44-4ec7-bbae-c2e48ccae750"
-      language-code="vi"
-      max-query-length="-1"
-    >
-      <df-messenger-chat-bubble chat-title="Trợ Lý AI Chợ Tốt"> </df-messenger-chat-bubble>
-    </df-messenger>
-    <style>
-      df-messenger {
-        z-index: 999;
-        position: fixed;
-        --df-messenger-font-color: #000;
-        --df-messenger-font-family: sans-serif;
-        --df-messenger-chat-background: #f3f6fc;
-        --df-messenger-message-user-background: #d3e3fd;
-        --df-messenger-message-bot-background: #fff;
-        --df-messenger-chat-window-width: 400px;
-        --df-messenger-chat-window-height: 900px;
-        bottom: 16px;
-        right: 16px;
-      }
-    </style>
-  </head>
+	<head>
+		<title>Âm Lịch Việt Nam - Vietnamese Lunisolar Calendar PWA</title>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta
+			name="description"
+			content="Âm Lịch Việt Nam Progressive Web App, phát triển bởi Trần Trọng Thanh, dựa trên thuật toán tính Âm Lịch của Hồ Ngọc Đức."
+		/>
+		<meta property="og:image" content="https://amlich.app/thumbnail.png" />
+		<link rel="icon" href="/favicon.ico" sizes="16x16" />
+		<link rel="icon" href="/app-icon.svg" type="image/svg+xml" />
+		<link rel="apple-touch-icon" href="/app-icon.png" />
+		<meta name="theme-color" content="#212121" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+		<link href="/css/base.css" rel="stylesheet" />
+		<link href="/css/index.css" rel="stylesheet" />
+		<script type="module" src="ce/lunar-cal.js"></script>
+		<link
+			rel="stylesheet"
+			href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css"
+		/>
+		<script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
+		<df-messenger
+			project-id="chotot-agent-mljvyb"
+			agent-id="84e170b2-cc44-4ec7-bbae-c2e48ccae750"
+			language-code="vi"
+			max-query-length="-1"
+		>
+			<df-messenger-chat-bubble chat-title="Trợ Lý AI Chợ Tốt"> </df-messenger-chat-bubble>
+		</df-messenger>
+		<style>
+			df-messenger {
+				z-index: 999;
+				position: fixed;
+				--df-messenger-font-color: #000;
+				--df-messenger-font-family: sans-serif;
+				--df-messenger-chat-background: #f3f6fc;
+				--df-messenger-message-user-background: #d3e3fd;
+				--df-messenger-message-bot-background: #fff;
+				--df-messenger-chat-window-width: 400px;
+				--df-messenger-chat-window-height: 900px;
+				bottom: 16px;
+				right: 16px;
+			}
+		</style>
+	</head>
 
-  <body>
-    <main class="container mx-auto">
-      <lunar-cal details-visible>
-        <h1>Âm Lịch Việt Nam</h1>
-        <datalist slot="public-holidays">
-          <!-- additional public holidays which are not fixed and dependent on the govement's decision -->
-          <option value="LUNAR--12-29">🌸 29 Tháng Chạp 🌸</option>
-          <option value="LUNAR--01-04">🌸 Mùng 4 Tết Nguyên Đán 🌸</option>
-          <option value="LUNAR--01-05">🌸 Mùng 5 Tết Nguyên Đán 🌸</option>
-          <option value="SOLAR--09-03">🇻🇳 Lễ Quốc Khánh 🇻🇳</option>
-          <option value="SOLAR--12-25">🎄 Lễ Giáng Sinh 🎄</option>
-        </datalist>
-      </lunar-cal>
-    </main>
-    <hr />
-    <footer class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-      <p>
-        Một phiên bản hiện đại của
-        <a href="https://www.informatik.uni-leipzig.de/~duc/amlich/" rel="noopener noreferrer"
-          >website Âm Lịch</a
-        >
-        bởi Hồ Ngọc Đức.<br />
-        © 2024 <a href="https://int3ractive.com">Trần Trọng Thanh</a>.
-        <code>&lt;lunar-cal&gt;</code>
-        <a href="https://github.com/trongthanh/amlich.app">code and documentation</a>. Built in Sài
-        Gòn with ❤️.
-      </p>
-    </footer>
-  </body>
+	<body>
+		<main class="container mx-auto">
+			<lunar-cal details-visible>
+				<h1>Âm Lịch Việt Nam</h1>
+				<datalist slot="public-holidays">
+					<!-- additional public holidays which are not fixed and dependent on the govement's decision -->
+					<option value="LUNAR--12-29">🌸 29 Tháng Chạp 🌸</option>
+					<option value="LUNAR--01-04">🌸 Mùng 4 Tết Nguyên Đán 🌸</option>
+					<option value="LUNAR--01-05">🌸 Mùng 5 Tết Nguyên Đán 🌸</option>
+					<option value="SOLAR--09-03">🇻🇳 Lễ Quốc Khánh 🇻🇳</option>
+					<option value="SOLAR--12-25">🎄 Lễ Giáng Sinh 🎄</option>
+				</datalist>
+			</lunar-cal>
+		</main>
+		<hr />
+		<footer class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+			<p>
+				Một phiên bản hiện đại của
+				<a href="https://www.informatik.uni-leipzig.de/~duc/amlich/" rel="noopener noreferrer"
+					>website Âm Lịch</a
+				>
+				bởi Hồ Ngọc Đức.<br />
+				© 2024-2026 <a href="https://thanh.im">Trần Trọng Thanh</a>.
+				<code>&lt;lunar-cal&gt;</code>
+				<a href="https://github.com/trongthanh/amlich.app">code and documentation</a>. Built in Sài Gòn with ❤️.
+			</p>
+		</footer>
+	</body>
 </html>
