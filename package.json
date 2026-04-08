@@ -8,21 +8,26 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "vite build",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"test": "vitest run",
+		"lint": "oxlint src/",
+		"format": "oxfmt src/",
+		"format:check": "oxfmt --check src/"
 	},
 	"devDependencies": {
 		"@rollup/plugin-commonjs": "^25.0.7",
 		"@rollup/plugin-node-resolve": "^15.2.3",
 		"autoprefixer": "^10.4.19",
-		"eslint": "^8.56.0",
-		"eslint-plugin-wc": "^2.0.4",
+		"oxfmt": "^0.44.0",
+		"oxlint": "^1.59.0",
 		"plain-tag": "^0.1.3",
 		"postcss": "^8.4.38",
 		"rollup-plugin-copy": "^3.5.0",
 		"rollup-plugin-minify-html-literals": "^1.2.6",
 		"tailwindcss": "^3.4.3",
 		"vite": "^5.0.8",
-		"vite-plugin-pwa": "^0.17.4"
+		"vite-plugin-pwa": "^0.17.4",
+		"vitest": "^2.1.9"
 	},
 	"dependencies": {
 		"@github/file-attachment-element": "^3.1.0",

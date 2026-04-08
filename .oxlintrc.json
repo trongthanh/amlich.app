@@ -1,0 +1,15 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"env": {
+		"browser": true,
+		"es2022": true
+	},
+	"globals": {},
+	"categories": {
+		"correctness": "error"
+	},
+	"rules": {
+		"no-unexpected-multiline": "off"
+	},
+	"ignorePatterns": ["dist/", "public/"]
+}

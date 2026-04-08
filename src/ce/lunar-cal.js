@@ -669,8 +669,8 @@ class LunisolarCalendar extends HTMLElement {
 			let nextBtn = wrapper.querySelector('.calendar-next button');
 			let todayDate = wrapper.querySelector('.calendar-today-date');
 			let dateNumberParent = wrapper.querySelector('.calendar-dates');
-			prevBtn.addEventListener('click', () => navigateToPreviousMonth());
-			nextBtn.addEventListener('click', () => navigateToNextMonth());
+			prevBtn.addEventListener('click', navigateToPreviousMonth);
+			nextBtn.addEventListener('click', navigateToNextMonth);
 			todayDate.addEventListener('click', navigateToCurrentMonth);
 			dateNumberParent.addEventListener('click', handleDateClick);
 		}
@@ -679,8 +679,8 @@ class LunisolarCalendar extends HTMLElement {
 			let nextBtn = wrapper.querySelector('.calendar-next button');
 			let todayDate = wrapper.querySelector('.calendar-today-date');
 			let dateNumberParent = wrapper.querySelector('.calendar-dates');
-			prevBtn.removeEventListener('click', () => navigateToPreviousMonth());
-			nextBtn.removeEventListener('click', () => navigateToNextMonth());
+			prevBtn.removeEventListener('click', navigateToPreviousMonth);
+			nextBtn.removeEventListener('click', navigateToNextMonth);
 			todayDate.removeEventListener('click', navigateToCurrentMonth);
 			dateNumberParent.removeEventListener('click', handleDateClick);
 		}

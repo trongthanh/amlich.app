@@ -130,8 +130,6 @@ export class CalendarDisplay extends LitElement {
 
 	// Render the UI as a function of component state
 	render() {
-		const firstDay = this._firstDate();
-
 		return html`<div class="wrapper">
 			<div>${this.month} - ${this.year}</div>
 			<div class="days-grid">${this._renderWeekDays()}</div>

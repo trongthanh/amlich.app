@@ -1,3 +1,7 @@
+# Agents settings
+.agents/
+.claude/
+
 # intermediate files during vite build
 public/assets/
 

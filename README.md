@@ -1,6 +1,51 @@
 # amlich.app
 
-Code for <a href="https://amlich.app">applich.app</a> (Lunisolar calendar)
+Code for <a href="https://amlich.app">amlich.app</a> (Lunisolar calendar)
+
+## Developing
+
+### Web Calendar (`src/index.html`)
+
+```bash
+pnpm dev          # Start dev server on port 8080
+pnpm build        # Build for production → dist/
+pnpm preview      # Preview the built site locally
+```
+
+### Curl/CLI Feature (`functions/[[path]].js`)
+
+Test the calendar output locally:
+
+```bash
+# Run the rendering tests
+pnpm test
+
+# Or simulate curl output directly:
+node --input-type=module <<'EOF'
+import { renderCalendar } from './src/lib/cli-calendar.js';
+
+// Render current month with today highlighted
+const now = new Date();
+const calendar = renderCalendar(now, false);  // false = plain text (no ANSI)
+console.log(calendar);
+
+// Specific date
+const date = new Date(2026, 3, 8);  // April 8, 2026
+const calAnsi = renderCalendar(date, true);  // true = ANSI colors
+console.log(calAnsi);
+EOF
+```
+
+**Deploy to production:**
+```bash
+git push origin main  # Cloudflare Pages auto-deploys; curl amlich.app works immediately
+```
+
+**Test live:**
+```bash
+curl amlich.app                   # Current month + today
+curl amlich.app/2026-04-08        # Specific date
+```
 
 ## `<lunar-cal>` Custom Element
 
@@ -35,11 +80,11 @@ These attributes are optional
 - [x] `<lunar-cal>` custom element (Web component)
 - [x] Installable PWA
 - [x] `prefer-color-scheme` for dark and light mode
+- [x] `curl amlich.app` — ANSI/plain-text calendar in terminal (like wttr.in)
 - [ ] Customization demo
 - [ ] npm package
 - [ ] JS API documentation
-- [ ] Unit tests
-- [ ] Clean code
+- [x] Unit tests (vitest)
 
 ## Thanks
 
