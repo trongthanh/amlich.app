@@ -1,6 +1,6 @@
 /* eslint-env node */
 import path from 'path';
-import minifyTaggedTemplate from 'rollup-plugin-minify-html-literals';
+import minifyTaggedTemplate from 'rollup-plugin-minify-template-literals';
 import { VitePWA } from 'vite-plugin-pwa';
 import commonjs from '@rollup/plugin-commonjs';
 import copy from 'rollup-plugin-copy';
