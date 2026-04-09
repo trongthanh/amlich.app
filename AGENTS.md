@@ -32,7 +32,7 @@ Vite root is `src/`, static assets in `public/`.
 
 ### Core Library
 
-- `src/lib/amlich.js` — Lunisolar calendar algorithm (by Ho Ngoc Duc). Handles solar-to-lunar date conversion using Julian day calculations. Exports `convertSolar2Lunar` and `getLunarDayInfo`.
+- `src/lib/amlich.js` — Lunisolar calendar algorithm (by Ho Ngoc Duc). Handles solar-to-lunar date conversion using Julian day calculations. Exports `convertSolar2Lunar`, `convertLunar2Solar`, and `getLunarDayInfo`.
 
 ### Styling
 
@@ -51,9 +51,12 @@ Vite root is `src/`, static assets in `public/`.
 ### URL Handling & Deep Linking
 
 - **SPA routing:** `public/_redirects` (Cloudflare Pages) routes all paths to `index.html`
-- **URL pattern:** `/YYYY-MM-DD` (e.g., `/2025-04-26`)
+- **URL patterns:** 
+  - Solar date: `/YYYY-MM-DD` (e.g., `/2025-04-26`)
+  - Lunar date: `/lYYYY-MM-DD` or `/LYYYY-MM-DD` (e.g., `/l2026-10-03` for lunar 10/3/2026)
 - **Architecture:** URL logic lives in `src/index.html` wrapper script, not in the component
-  - On load: Parses URL path → sets `initial-date` attribute on `<lunar-cal>`
-  - On selection: Listens for `date-selected` event → updates history with `pushState`/`replaceState`
-  - On navigation: Listens for `popstate` → calls `setSelectedDate()` to update component
+  - On load: Parses URL path (solar or lunar) → converts lunar to solar if needed → sets `initial-date` attribute on `<lunar-cal>`
+  - On selection: Listens for `date-selected` event → updates history with `pushState`/`replaceState` (always uses solar format)
+  - On navigation: Listens for `popstate` → parses URL (solar or lunar) → calls `setSelectedDate()` to update component
 - **Component communication:** Component emits `date-selected` event with date details; wrapper reads `selectedDate` property
+- **Conversion:** Uses `convertLunar2Solar` from `amlich.js` to convert lunar dates to solar dates with timezone support (UTC+7 for Vietnam)

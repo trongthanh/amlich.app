@@ -19,6 +19,10 @@
 		<link href="/css/base.css" rel="stylesheet" />
 		<link href="/css/index.css" rel="stylesheet" />
 		<script type="module" src="ce/lunar-cal.js"></script>
+	<script type="module">
+		import { convertLunar2Solar } from './lib/amlich.js';
+		window.convertLunar2Solar = convertLunar2Solar;
+	</script>
 		<link
 			rel="stylesheet"
 			href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css"
@@ -82,10 +86,26 @@
 
 			// Parse URL path and set initial date
 			function initializeFromUrl() {
-				const match = /^\/(\d{4})-(\d{2})-(\d{2})$/.exec(window.location.pathname);
+				// Try solar date format: /YYYY-MM-DD
+				let match = /^\/(\d{4})-(\d{2})-(\d{2})$/.exec(window.location.pathname);
 				if (match) {
 					const [, year, month, day] = match;
 					calendar.setAttribute('initial-date', `${year}-${month}-${day}`);
+					return;
+				}
+
+				// Try lunar date format: /l[YYYY-MM-DD or /L[YYYY-MM-DD
+				match = /^\/[lL](\d{4})-(\d{2})-(\d{2})$/.exec(window.location.pathname);
+				if (match) {
+					const [, lunarYear, lunarMonth, lunarDay] = match;
+					const [solarDay, solarMonth, solarYear] = window.convertLunar2Solar(
+						parseInt(lunarDay),
+						parseInt(lunarMonth),
+						parseInt(lunarYear),
+						0, // lunarLeap: 0 for non-leap month
+						7  // timeZone: Vietnam UTC+7
+					);
+					calendar.setAttribute('initial-date', `${solarYear}-${String(solarMonth).padStart(2, '0')}-${String(solarDay).padStart(2, '0')}`);
 				}
 			}
 
@@ -107,10 +127,26 @@
 
 			// Handle browser back/forward
 			function handlePopState() {
-				const match = /^\/(\d{4})-(\d{2})-(\d{2})$/.exec(window.location.pathname);
+				// Try solar date format: /YYYY-MM-DD
+				let match = /^\/(\d{4})-(\d{2})-(\d{2})$/.exec(window.location.pathname);
 				if (match) {
 					const [, year, month, day] = match;
 					calendar.setSelectedDate(new Date(`${year}-${month}-${day}T12:00:00`));
+					return;
+				}
+
+				// Try lunar date format: /l[YYYY-MM-DD or /L[YYYY-MM-DD
+				match = /^\/[lL](\d{4})-(\d{2})-(\d{2})$/.exec(window.location.pathname);
+				if (match) {
+					const [, lunarYear, lunarMonth, lunarDay] = match;
+					const [solarDay, solarMonth, solarYear] = window.convertLunar2Solar(
+						parseInt(lunarDay),
+						parseInt(lunarMonth),
+						parseInt(lunarYear),
+						0, // lunarLeap: 0 for non-leap month
+						7  // timeZone: Vietnam UTC+7
+					);
+					calendar.setSelectedDate(new Date(`${solarYear}-${String(solarMonth).padStart(2, '0')}-${String(solarDay).padStart(2, '0')}T12:00:00`));
 				}
 			}
 

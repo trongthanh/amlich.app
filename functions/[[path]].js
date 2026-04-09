@@ -1,4 +1,5 @@
 import { renderCalendar, renderCalendarMarkdown, getVietnamNow } from '../src/lib/cli-calendar.js';
+import { convertLunar2Solar } from '../src/lib/amlich.js';
 
 function isBrowserRequest(request) {
 	const ua = (request.headers.get('User-Agent') || '').toLowerCase();
@@ -31,18 +32,34 @@ export async function onRequest(context) {
 		return env.ASSETS.fetch(request);
 	}
 
-	// Parse optional date from URL path (expects YYYY-MM-DD)
+	// Parse optional date from URL path (expects YYYY-MM-DD or lYYYY-MM-DD / LYYYY-MM-DD)
 	const pathStr = (params.path || []).join('/');
 	let targetDate;
 
 	if (pathStr) {
-		const parsed = new Date(pathStr);
-		targetDate = isNaN(parsed) ? null : parsed;
-		if (!targetDate) {
-			return new Response('Invalid date. Use format: curl -L amlich.app/YYYY-MM-DD\n', {
-				status: 400,
-				headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-			});
+		// Try solar date format: YYYY-MM-DD
+		let parsed = new Date(pathStr);
+		if (!isNaN(parsed)) {
+			targetDate = parsed;
+		} else {
+			// Try lunar date format: lYYYY-MM-DD or LYYYY-MM-DD
+			const lunarMatch = /^[lL](\d{4})-(\d{2})-(\d{2})$/.exec(pathStr);
+			if (lunarMatch) {
+				const [, lunarYear, lunarMonth, lunarDay] = lunarMatch;
+				const [solarDay, solarMonth, solarYear] = convertLunar2Solar(
+					parseInt(lunarDay),
+					parseInt(lunarMonth),
+					parseInt(lunarYear),
+					0, // lunarLeap: 0 for non-leap month
+					7  // timeZone: Vietnam UTC+7
+				);
+				targetDate = new Date(solarYear, solarMonth - 1, solarDay);
+			} else {
+				return new Response('Invalid date. Use format: curl -L amlich.app/YYYY-MM-DD or curl -L amlich.app/lYYYY-MM-DD\n', {
+					status: 400,
+					headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+				});
+			}
 		}
 	} else {
 		// Default: Vietnam today
