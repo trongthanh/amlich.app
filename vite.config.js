@@ -2,10 +2,7 @@
 import path from 'path';
 import minifyTaggedTemplate from 'rollup-plugin-minify-template-literals';
 import { VitePWA } from 'vite-plugin-pwa';
-import commonjs from '@rollup/plugin-commonjs';
 import copy from 'rollup-plugin-copy';
-// import css from 'rollup-plugin-css-only';
-import resolve from '@rollup/plugin-node-resolve';
 
 /** @type {import('vite').UserConfig} */
 export default {
@@ -23,8 +20,6 @@ export default {
 		},
 	},
 	plugins: [
-		resolve(),
-		commonjs(),
 		// Bundle styles into dist/bundle.css
 		// css({
 		// 	output: 'bundle.css',
