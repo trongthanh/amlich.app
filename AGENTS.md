@@ -26,7 +26,7 @@ Vite root is `src/`, static assets in `public/`.
 
 ### Custom Elements
 
-- **`<lunar-cal>`** (`src/ce/lunar-cal.js`) — Main calendar component. Vanilla JS custom element using `plain-tag` for tagged template syntax highlighting. Self-contained with shadow DOM styles. Accepts attributes: `details-visible`, `initial-date`, `timezone`. Public holidays passed via `<datalist slot="public-holidays">`.
+- **`<lunar-cal>`** (`src/ce/lunar-cal.js`) — Main calendar component. Vanilla JS custom element using `plain-tag` for tagged template syntax highlighting. Self-contained with shadow DOM styles. Accepts attributes: `details-visible`, `initial-date`, `timezone`. Public holidays passed via `<datalist slot="public-holidays">`. Emits `date-selected` event when date changes. Public getter: `selectedDate`. Component is pure (no URL manipulation).
 - **`<cal-display>`** (`src/ce/cal-display.js`) — Lit-based calendar display for wallpaper maker. Attributes: `month`, `year`, `start-week-on`.
 - **`<wallpaper-display>`** (`src/ce/wallpaper-display.js`) — Lit-based wallpaper canvas with image upload via `@github/file-attachment-element`.
 
@@ -47,3 +47,13 @@ Vite root is `src/`, static assets in `public/`.
 - PWA support via vite-plugin-pwa with auto-update registration
 - The app supports `prefers-color-scheme` for dark/light mode via CSS custom properties
 - `plain-tag` is used in `lunar-cal.js` as a no-op tagged template for editor syntax highlighting (html`` and css`` tags); Lit components use Lit's own tagged templates
+
+### URL Handling & Deep Linking
+
+- **SPA routing:** `public/_redirects` (Cloudflare Pages) routes all paths to `index.html`
+- **URL pattern:** `/YYYY-MM-DD` (e.g., `/2025-04-26`)
+- **Architecture:** URL logic lives in `src/index.html` wrapper script, not in the component
+  - On load: Parses URL path → sets `initial-date` attribute on `<lunar-cal>`
+  - On selection: Listens for `date-selected` event → updates history with `pushState`/`replaceState`
+  - On navigation: Listens for `popstate` → calls `setSelectedDate()` to update component
+- **Component communication:** Component emits `date-selected` event with date details; wrapper reads `selectedDate` property

@@ -12,6 +12,20 @@ pnpm build        # Build for production → dist/
 pnpm preview      # Preview the built site locally
 ```
 
+**Deep Linking & URL Navigation**
+
+The calendar supports bookmarkable URLs for specific dates:
+
+```
+https://amlich.app/                  # Today's date
+https://amlich.app/2025-04-26        # April 26, 2025
+https://amlich.app/2024-01-01        # January 1, 2024
+```
+
+- When you select a date in the calendar, the URL updates automatically
+- Browser back/forward buttons navigate through previously viewed dates
+- URLs are shareable and load the specific date on initial page load
+
 ### Curl/CLI Feature (`functions/[[path]].js`)
 
 Test the calendar output locally:
@@ -70,6 +84,7 @@ These attributes are optional
 - [x] Installable PWA
 - [x] `prefer-color-scheme` for dark and light mode
 - [x] `curl amlich.app` — ANSI/markdown calendar in terminal (like wttr.in)
+- [x] Deep linking & URL navigation — bookmark and share dates
 - [ ] Customization demo
 - [ ] npm package
 - [ ] JS API documentation

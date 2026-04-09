@@ -51,7 +51,7 @@
 
 	<body>
 		<main class="container mx-auto">
-			<lunar-cal details-visible>
+			<lunar-cal details-visible id="calendar">
 				<h1>Âm Lịch Việt Nam</h1>
 				<datalist slot="public-holidays">
 					<!-- additional public holidays which are not fixed and dependent on the govement's decision -->
@@ -76,5 +76,50 @@
 				<a href="https://github.com/trongthanh/amlich.app">code and documentation</a>. Built in Sài Gòn with ❤️.
 			</p>
 		</footer>
+		<script>
+			const calendar = document.getElementById('calendar');
+			let isInitialLoad = true;
+
+			// Parse URL path and set initial date
+			function initializeFromUrl() {
+				const match = /^\/(\d{4})-(\d{2})-(\d{2})$/.exec(window.location.pathname);
+				if (match) {
+					const [, year, month, day] = match;
+					calendar.setAttribute('initial-date', `${year}-${month}-${day}`);
+				}
+			}
+
+			// Update URL when calendar date changes
+			function handleDateSelected(e) {
+				const date = e.detail.date;
+				const year = date.getFullYear();
+				const month = String(date.getMonth() + 1).padStart(2, '0');
+				const day = String(date.getDate()).padStart(2, '0');
+				const newPath = `/${year}-${month}-${day}`;
+
+				if (isInitialLoad) {
+					history.replaceState({ date: newPath }, '', newPath);
+					isInitialLoad = false;
+				} else if (window.location.pathname !== newPath) {
+					history.pushState({ date: newPath }, '', newPath);
+				}
+			}
+
+			// Handle browser back/forward
+			function handlePopState() {
+				const match = /^\/(\d{4})-(\d{2})-(\d{2})$/.exec(window.location.pathname);
+				if (match) {
+					const [, year, month, day] = match;
+					calendar.setSelectedDate(new Date(`${year}-${month}-${day}T12:00:00`));
+				}
+			}
+
+			// Wait for custom element to be defined
+			customElements.whenDefined('lunar-cal').then(() => {
+				initializeFromUrl();
+				calendar.addEventListener('date-selected', handleDateSelected);
+				window.addEventListener('popstate', handlePopState);
+			});
+		</script>
 	</body>
 </html>

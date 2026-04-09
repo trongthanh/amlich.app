@@ -415,6 +415,7 @@ class LunisolarCalendar extends HTMLElement {
 
 	constructor() {
 		super(); // always call super() first in the constructor.
+		const el = this; // capture element reference
 		// Create a shadow root
 		this.attachShadow({ mode: 'open' });
 		// the wrapper element
@@ -555,6 +556,12 @@ class LunisolarCalendar extends HTMLElement {
 				elem.classList.remove('selected');
 			});
 			displayDateInfo();
+			// Emit custom event so wrapper can sync URL
+			el.dispatchEvent(new CustomEvent('date-selected', {
+				detail: { date: new Date(selectedDate) },
+				bubbles: true,
+				composed: true
+			}));
 		}
 		// prettier-ignore
 		const detailsHtml = () => html`
@@ -660,7 +667,9 @@ class LunisolarCalendar extends HTMLElement {
 				(event.isSolarEvent || event.isPublicHoliday ? ' public-holiday' : '');
 			const lunarDateStr = d === 1 || sd === 1 ? `${d}/${m}` : d === 15 ? `${d} <small>🌕</small>` : `${d}`;
 
-			const html = `<a class="${classes}" data-num=${sd} href="#${sy}-${sm}-${sd}"><div class="solar-date">${sd}</div><span class="lunar-date">${lunarDateStr}</span></a>`;
+			const smStr = String(sm).padStart(2, '0');
+			const sdStr = String(sd).padStart(2, '0');
+			const html = `<a class="${classes}" data-num=${sd} href="/${sy}-${smStr}-${sdStr}"><div class="solar-date">${sd}</div><span class="lunar-date">${lunarDateStr}</span></a>`;
 			return html;
 		}
 
@@ -806,6 +815,10 @@ class LunisolarCalendar extends HTMLElement {
 		this.setSelectedDate = setSelectedDate.bind(this);
 		this.removeEvents = removeEvents.bind(this);
 		this.setDetailsVisible = setDetailsVisible.bind(this);
+		Object.defineProperty(el, 'selectedDate', {
+			get: () => new Date(selectedDate),
+			enumerable: true
+		});
 	}
 
 	connectedCallback() {
