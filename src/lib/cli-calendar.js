@@ -245,7 +245,7 @@ export function renderCalendar(targetDate, useAnsi, today = getVietnamNow(), sho
 
 	lines.push(`<${a(BOLD, 'amlich.app')} bởi ${a(BOLD, 'Thanh Trần')}>`);
 
-	return lines.join('\n');
+	return lines.join('\n') + '\n';
 }
 
 /**
@@ -385,5 +385,5 @@ export function renderCalendarMarkdown(targetDate, today = getVietnamNow(), show
 	lines.push('');
 	lines.push('<**amlich.app** bởi **Thanh Trần**>');
 
-	return lines.join('\n');
+	return lines.join('\n') + '\n';
 }
