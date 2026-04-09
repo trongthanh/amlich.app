@@ -480,7 +480,7 @@ class LunisolarCalendar extends HTMLElement {
 		function navigateToPreviousMonth(dateNum) {
 			const startMonth = selectedDate.getMonth();
 			selectedDate.setMonth(selectedDate.getMonth() - 1);
-			if (dateNum) selectedDate.setDate(dateNum);
+			if (typeof dateNum === 'number') selectedDate.setDate(dateNum);
 			if (selectedDate.getMonth() == startMonth) {
 				// if month not changed, it means startMonth date exceed previous month total days
 				selectedDate.setDate(0); // set to last day of previous month
@@ -491,7 +491,7 @@ class LunisolarCalendar extends HTMLElement {
 		function navigateToNextMonth(dateNum) {
 			const startMonth = selectedDate.getMonth();
 			selectedDate.setMonth(selectedDate.getMonth() + 1);
-			if (dateNum) selectedDate.setDate(dateNum);
+			if (typeof dateNum === 'number') selectedDate.setDate(dateNum);
 			if (selectedDate.getMonth() > startMonth + 1) {
 				// if it jump 2 months forward (due to last day exceed next month total days)
 				selectedDate.setDate(0); // set to last day of previous month
@@ -503,7 +503,7 @@ class LunisolarCalendar extends HTMLElement {
 			let currentMonth = today.getMonth();
 			let currentYear = today.getFullYear();
 			selectedDate.setMonth(currentMonth);
-			selectedDate.setYear(currentYear);
+			selectedDate.setFullYear(currentYear);
 			selectedDate.setDate(today.getDate());
 			plotDates();
 		}
