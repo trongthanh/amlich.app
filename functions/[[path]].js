@@ -28,7 +28,7 @@ export function isWgetRequest(request) {
 const AI_AGENT_UA_PATTERNS = [
 	'claude-code',
 	'claude/',
-	'claude-user/',
+	'claude-user',
 	'anthropic',
 	'chatgpt-user',
 	'openai',

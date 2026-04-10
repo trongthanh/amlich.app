@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isBrowserRequest, isCurlRequest, isWgetRequest, acceptsMarkdown, isStaticFilePath } from './[[path]].js';
+import { isBrowserRequest, isCurlRequest, isWgetRequest, isAiAgentRequest, acceptsMarkdown, isStaticFilePath } from './[[path]].js';
 
 function makeRequest(headers = {}) {
 	return new Request('https://amlich.app/', { headers });
@@ -73,6 +73,50 @@ describe('isBrowserRequest', () => {
 
 	it('returns false with no headers (programmatic/AI agent)', () => {
 		expect(isBrowserRequest(makeRequest({}))).toBe(false);
+	});
+});
+
+describe('isAiAgentRequest', () => {
+	it('returns true for Claude-User Mozilla-style UA', () => {
+		expect(isAiAgentRequest(makeRequest({
+			'User-Agent': 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Claude-User/1.0; +Claude-User@anthropic.com)',
+		}))).toBe(true);
+	});
+
+	it('returns true for Claude-User with claude-code version UA', () => {
+		expect(isAiAgentRequest(makeRequest({
+			'User-Agent': 'Claude-User (claude-code/2.1.98; +https://support.anthropic.com/)',
+		}))).toBe(true);
+	});
+
+	it('returns true for axios', () => {
+		expect(isAiAgentRequest(makeRequest({ 'User-Agent': 'axios/1.8.4' }))).toBe(true);
+	});
+
+	it('returns true for future axios versions', () => {
+		expect(isAiAgentRequest(makeRequest({ 'User-Agent': 'axios/2.0.0' }))).toBe(true);
+	});
+
+	it('returns true for empty user-agent', () => {
+		expect(isAiAgentRequest(makeRequest({}))).toBe(true);
+	});
+
+	it('returns true for missing User-Agent header', () => {
+		expect(isAiAgentRequest(makeRequest({}))).toBe(true);
+	});
+
+	it('returns false for curl', () => {
+		expect(isAiAgentRequest(makeRequest({ 'User-Agent': 'curl/8.7.1' }))).toBe(false);
+	});
+
+	it('returns false for wget', () => {
+		expect(isAiAgentRequest(makeRequest({ 'User-Agent': 'Wget/1.21.3' }))).toBe(false);
+	});
+
+	it('returns false for a plain browser UA', () => {
+		expect(isAiAgentRequest(makeRequest({
+			'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+		}))).toBe(false);
 	});
 });
 
