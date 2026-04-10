@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isBrowserRequest, isCurlRequest, isWgetRequest, acceptsMarkdown } from './[[path]].js';
+import { isBrowserRequest, isCurlRequest, isWgetRequest, acceptsMarkdown, isStaticFilePath } from './[[path]].js';
 
 function makeRequest(headers = {}) {
 	return new Request('https://amlich.app/', { headers });
@@ -91,5 +91,31 @@ describe('acceptsMarkdown', () => {
 
 	it('returns false for no Accept header', () => {
 		expect(acceptsMarkdown(makeRequest({}))).toBe(false);
+	});
+});
+
+describe('isStaticFilePath', () => {
+	it('returns true for llms.txt', () => {
+		expect(isStaticFilePath('llms.txt')).toBe(true);
+	});
+
+	it('returns true for assets/icon.png', () => {
+		expect(isStaticFilePath('assets/icon.png')).toBe(true);
+	});
+
+	it('returns true for css/base.css', () => {
+		expect(isStaticFilePath('css/base.css')).toBe(true);
+	});
+
+	it('returns false for a date path 2026-04-10', () => {
+		expect(isStaticFilePath('2026-04-10')).toBe(false);
+	});
+
+	it('returns false for a lunar date path l2026-10-03', () => {
+		expect(isStaticFilePath('l2026-10-03')).toBe(false);
+	});
+
+	it('returns false for empty string', () => {
+		expect(isStaticFilePath('')).toBe(false);
 	});
 });

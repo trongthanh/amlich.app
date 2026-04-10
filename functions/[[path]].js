@@ -29,6 +29,10 @@ export function acceptsMarkdown(request) {
 	return accept.includes('text/markdown') || accept.includes('application/markdown');
 }
 
+export function isStaticFilePath(pathStr) {
+	return /\.[a-zA-Z0-9]+$/.test(pathStr);
+}
+
 export async function onRequest(context) {
 	const { request, env, params } = context;
 
@@ -39,6 +43,12 @@ export async function onRequest(context) {
 
 	// Parse optional date from URL path (expects YYYY-MM-DD or lYYYY-MM-DD / LYYYY-MM-DD)
 	const pathStr = (params.path || []).join('/');
+
+	// Static file requests (e.g. /llms.txt) → serve as-is for all clients
+	if (pathStr && isStaticFilePath(pathStr)) {
+		return env.ASSETS.fetch(request);
+	}
+
 	let targetDate;
 
 	if (pathStr) {

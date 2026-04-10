@@ -75,4 +75,9 @@ export default {
 	server: {
 		port: 8080,
 	},
+
+	test: {
+		root: __dirname,
+		include: ['src/**/*.test.{js,ts}', 'functions/**/*.test.{js,ts}'],
+	},
 };
