@@ -52,12 +52,12 @@ const LUNAR_EVENTS = {
 	'3/1': '🎊 Mùng 3 Tết',
 	'15/1': '🏮 Rằm Tháng Giêng',
 	'3/3': '🥚 Tết Hàn Thực',
-	'10/3': '🏯 Giỗ Tổ Hùng Vương',
+	'10/3': '🙏 Giỗ Tổ Hùng Vương',
 	'15/4': '☸️ Phật Đản',
 	'5/5': '🪙 Tết Đoan Ngọ',
 	'15/7': '🪷 Lễ Vu Lan',
 	'15/8': '🥮 Tết Trung Thu',
-	'23/12': '🔥 Tết Táo Quân',
+	'23/12': '🔥 Ông Táo về Trời',
 };
 
 function stripHtml(str) {
