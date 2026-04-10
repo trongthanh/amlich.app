@@ -1,7 +1,7 @@
 import { renderCalendar, renderCalendarMarkdown, getVietnamNow } from '../src/lib/cli-calendar.js';
 import { convertLunar2Solar } from '../src/lib/amlich.js';
 
-function isBrowserRequest(request) {
+export function isBrowserRequest(request) {
 	const ua = (request.headers.get('User-Agent') || '').toLowerCase();
 	const secFetchMode = request.headers.get('Sec-Fetch-Mode');
 	const accept = request.headers.get('Accept') || '';
@@ -15,11 +15,16 @@ function isBrowserRequest(request) {
 	return false;
 }
 
-function isCurlRequest(request) {
+export function isCurlRequest(request) {
 	return (request.headers.get('User-Agent') || '').toLowerCase().startsWith('curl/');
 }
 
-function acceptsMarkdown(request) {
+export function isWgetRequest(request) {
+	const ua = (request.headers.get('User-Agent') || '').toLowerCase();
+	return ua.startsWith('wget/');
+}
+
+export function acceptsMarkdown(request) {
 	const accept = request.headers.get('Accept') || '';
 	return accept.includes('text/markdown') || accept.includes('application/markdown');
 }
@@ -76,7 +81,7 @@ export async function onRequest(context) {
 		body = renderCalendarMarkdown(targetDate, undefined, showFooter);
 		contentType = 'text/markdown; charset=utf-8';
 	} else {
-		const useAnsi = isCurlRequest(request);
+		const useAnsi = isCurlRequest(request) || isWgetRequest(request);
 		body = renderCalendar(targetDate, useAnsi, undefined, showFooter);
 		contentType = 'text/plain; charset=utf-8';
 	}

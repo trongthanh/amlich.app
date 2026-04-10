@@ -1,0 +1,56 @@
+# amlich.app — Vietnamese Lunisolar Calendar
+
+> A Progressive Web App (PWA) and CLI-friendly tool for the Vietnamese lunisolar (âm lịch) calendar. Built by Trần Trọng Thanh, based on the lunar calendar algorithm by Hồ Ngọc Đức.
+
+## What It Does
+
+amlich.app lets you look up any date on the Vietnamese lunar calendar (âm lịch), including:
+
+- Lunar date equivalent for any solar (Gregorian) date
+- Solar date for any lunar date
+- Vietnamese public holidays and traditional lunar events (Tết, Trung Thu, Vu Lan, etc.)
+- 24 solar terms (tiết khí) with emoji indicators
+- Current month calendar view with week layout
+
+The app supports both a web UI and a **curl/wget-friendly CLI output** with ANSI colors and Markdown table format.
+
+## URL Patterns
+
+- `/` — Today's calendar
+- `/YYYY-MM-DD` — Calendar for a specific solar (Gregorian) date (e.g. `/2025-04-26`)
+- `/lYYYY-MM-DD` or `/LYYYY-MM-DD` — Calendar for a specific lunar date (e.g. `/l2026-10-03` for lunar month 10, day 3, year 2026)
+
+## curl / wget Usage
+
+amlich.app detects curl and wget User-Agents and returns a terminal-friendly ANSI calendar.
+
+**Always use `https://` or the `-L` flag** (the HTTP endpoint redirects to HTTPS):
+
+```sh
+# Today's calendar with ANSI colors
+curl https://amlich.app
+wget -qO- https://amlich.app
+
+# Calendar for a specific solar date
+curl https://amlich.app/2025-04-26
+wget -qO- https://amlich.app/2025-04-26
+
+# Calendar for a specific lunar date (lunar 10/3/2026)
+curl https://amlich.app/l2026-10-03
+
+# Plain text (no ANSI colors), useful for piping
+curl -A '' https://amlich.app
+
+# Markdown table output
+curl -H 'Accept: text/markdown' https://amlich.app
+```
+
+## Output Formats
+
+| User-Agent / Accept Header | Format |
+|---|---|
+| `curl/*` | ANSI colored calendar (terminal-friendly) |
+| `Wget/*` | ANSI colored calendar (terminal-friendly) |
+| `Accept: text/markdown` | Markdown table |
+| Other non-browser clients | Plain text |
+| Browser | Full PWA web UI |

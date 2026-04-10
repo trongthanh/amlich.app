@@ -48,6 +48,7 @@ git push origin main  # Cloudflare Pages auto-deploys; curl amlich.app works imm
 ```bash
 curl amlich.app                   # Current month + today
 curl amlich.app/2026-04-08        # Specific date
+wget -qO- https://amlich.app      # wget also gets ANSI colors
 ```
 
 ## `<lunar-cal>` Custom Element
