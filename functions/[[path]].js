@@ -24,6 +24,31 @@ export function isWgetRequest(request) {
 	return ua.startsWith('wget/');
 }
 
+// AI agent UA patterns: Claude Code, OpenAI tools, Google AI, LangChain, etc.
+const AI_AGENT_UA_PATTERNS = [
+	'claude-code',
+	'claude/',
+	'claude-user/',
+	'anthropic',
+	'chatgpt-user',
+	'openai',
+	'gemini',
+	'deepseek',
+	'qwen',
+	'grok',
+	'gpt',
+	'langchain',
+	'openrouter',
+	'axios',
+];
+
+export function isAiAgentRequest(request) {
+	const ua = (request.headers.get('User-Agent') || '').toLowerCase();
+	// Empty or missing UA → treat as programmatic/AI agent
+	if (!ua) return true;
+	return AI_AGENT_UA_PATTERNS.some((pattern) => ua.includes(pattern));
+}
+
 export function acceptsMarkdown(request) {
 	const accept = request.headers.get('Accept') || '';
 	return accept.includes('text/markdown') || accept.includes('application/markdown');
@@ -37,7 +62,8 @@ export async function onRequest(context) {
 	const { request, env, params } = context;
 
 	// Browser requests → serve static assets as normal
-	if (isBrowserRequest(request)) {
+	// AI agents are checked first so their UA doesn't accidentally match browser heuristics
+	if (!isAiAgentRequest(request) && isBrowserRequest(request)) {
 		return env.ASSETS.fetch(request);
 	}
 
@@ -66,14 +92,17 @@ export async function onRequest(context) {
 					parseInt(lunarMonth),
 					parseInt(lunarYear),
 					0, // lunarLeap: 0 for non-leap month
-					7  // timeZone: Vietnam UTC+7
+					7 // timeZone: Vietnam UTC+7
 				);
 				targetDate = new Date(solarYear, solarMonth - 1, solarDay);
 			} else {
-				return new Response('Invalid date. Use format: curl -L amlich.app/YYYY-MM-DD or curl -L amlich.app/lYYYY-MM-DD\n', {
-					status: 400,
-					headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-				});
+				return new Response(
+					'Invalid date. Use format: curl -L amlich.app/YYYY-MM-DD or curl -L amlich.app/lYYYY-MM-DD\n',
+					{
+						status: 400,
+						headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+					}
+				);
 			}
 		}
 	} else {
@@ -87,7 +116,7 @@ export async function onRequest(context) {
 
 	const showFooter = !!pathStr;
 
-	if (acceptsMarkdown(request)) {
+	if (acceptsMarkdown(request) || isAiAgentRequest(request)) {
 		body = renderCalendarMarkdown(targetDate, undefined, showFooter);
 		contentType = 'text/markdown; charset=utf-8';
 	} else {
