@@ -54,6 +54,29 @@ export function acceptsMarkdown(request) {
 	return accept.includes('text/markdown') || accept.includes('application/markdown');
 }
 
+function getAcceptQValue(accept, type) {
+	for (const part of accept.split(',')) {
+		const [mediaType, ...params] = part.trim().split(';');
+		if (mediaType.trim().toLowerCase() === type) {
+			const qParam = params.find((p) => p.trim().startsWith('q='));
+			return qParam ? parseFloat(qParam.trim().slice(2)) : 1.0;
+		}
+	}
+	return 0;
+}
+
+// Returns true if text/plain is explicitly preferred over text/markdown
+export function prefersPlainText(request) {
+	const accept = request.headers.get('Accept') || '';
+	if (!accept.includes('text/plain')) return false;
+	const plainQ = getAcceptQValue(accept, 'text/plain');
+	const markdownQ = Math.max(
+		getAcceptQValue(accept, 'text/markdown'),
+		getAcceptQValue(accept, 'application/markdown'),
+	);
+	return plainQ >= markdownQ;
+}
+
 export function isStaticFilePath(pathStr) {
 	return /\.[a-zA-Z0-9]+$/.test(pathStr);
 }
@@ -61,13 +84,7 @@ export function isStaticFilePath(pathStr) {
 export async function onRequest(context) {
 	const { request, env, params } = context;
 
-	// Browser requests → serve static assets as normal
-	// AI agents are checked first so their UA doesn't accidentally match browser heuristics
-	if (!isAiAgentRequest(request) && isBrowserRequest(request)) {
-		return env.ASSETS.fetch(request);
-	}
-
-	// Parse optional date from URL path (expects YYYY-MM-DD or lYYYY-MM-DD / LYYYY-MM-DD)
+	// Parse path first — needed for static file check before anything else
 	const pathStr = (params.path || []).join('/');
 
 	// Static file requests (e.g. /llms.txt) → serve as-is for all clients
@@ -75,11 +92,23 @@ export async function onRequest(context) {
 		return env.ASSETS.fetch(request);
 	}
 
+	// Classify the request — determines whether we render text or fall back to the SPA
+	const isAiAgent      = isAiAgentRequest(request);
+	const wantsMarkdown  = acceptsMarkdown(request);
+	const wantsPlainText = prefersPlainText(request);
+	const isCurl = isCurlRequest(request);
+	const isWget = isWgetRequest(request);
+
+	// No text-output signal → serve the browser SPA (fallback for all other clients too)
+	if (!isAiAgent && !wantsMarkdown && !wantsPlainText && !isCurl && !isWget) {
+		return env.ASSETS.fetch(request);
+	}
+
 	let targetDate;
 
 	if (pathStr) {
 		// Try solar date format: YYYY-MM-DD
-		let parsed = new Date(pathStr);
+		const parsed = new Date(pathStr);
 		if (!isNaN(parsed)) {
 			targetDate = parsed;
 		} else {
@@ -92,16 +121,13 @@ export async function onRequest(context) {
 					parseInt(lunarMonth),
 					parseInt(lunarYear),
 					0, // lunarLeap: 0 for non-leap month
-					7 // timeZone: Vietnam UTC+7
+					7  // timeZone: Vietnam UTC+7
 				);
 				targetDate = new Date(solarYear, solarMonth - 1, solarDay);
 			} else {
 				return new Response(
 					'Invalid date. Use format: curl -L amlich.app/YYYY-MM-DD or curl -L amlich.app/lYYYY-MM-DD\n',
-					{
-						status: 400,
-						headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-					}
+					{ status: 400, headers: { 'Content-Type': 'text/plain; charset=utf-8' } }
 				);
 			}
 		}
@@ -111,21 +137,17 @@ export async function onRequest(context) {
 		targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 	}
 
-	let body;
-	let contentType;
-
 	const showFooter = !!pathStr;
 
-	if (acceptsMarkdown(request) || isAiAgentRequest(request)) {
-		body = renderCalendarMarkdown(targetDate, undefined, showFooter);
-		contentType = 'text/markdown; charset=utf-8';
-	} else {
-		const useAnsi = isCurlRequest(request) || isWgetRequest(request);
-		body = renderCalendar(targetDate, useAnsi, undefined, showFooter);
-		contentType = 'text/plain; charset=utf-8';
+	// Render markdown for AI agents and markdown-capable clients, unless plain text is preferred
+	if ((wantsMarkdown || isAiAgent) && !wantsPlainText) {
+		return new Response(renderCalendarMarkdown(targetDate, undefined, showFooter), {
+			headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
+		});
 	}
 
-	return new Response(body, {
-		headers: { 'Content-Type': contentType },
+	// Render plain text — with ANSI colors for curl/wget, without for everything else
+	return new Response(renderCalendar(targetDate, isCurl || isWget, undefined, showFooter), {
+		headers: { 'Content-Type': 'text/plain; charset=utf-8' },
 	});
 }

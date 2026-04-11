@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isBrowserRequest, isCurlRequest, isWgetRequest, isAiAgentRequest, acceptsMarkdown, isStaticFilePath } from './[[path]].js';
+import { isBrowserRequest, isCurlRequest, isWgetRequest, isAiAgentRequest, acceptsMarkdown, prefersPlainText, isStaticFilePath } from './[[path]].js';
 
 function makeRequest(headers = {}) {
 	return new Request('https://amlich.app/', { headers });
@@ -117,6 +117,41 @@ describe('isAiAgentRequest', () => {
 		expect(isAiAgentRequest(makeRequest({
 			'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
 		}))).toBe(false);
+	});
+});
+
+describe('prefersPlainText', () => {
+	it('returns true when text/plain has higher q than text/markdown', () => {
+		expect(prefersPlainText(makeRequest({ 'Accept': 'text/plain;q=1.0, text/markdown;q=0.9, text/html;q=0.8, */*;q=0.1' }))).toBe(true);
+	});
+
+	it('returns true when text/plain is listed without q (defaults to 1.0) and markdown has lower q', () => {
+		expect(prefersPlainText(makeRequest({ 'Accept': 'text/plain, text/markdown;q=0.8' }))).toBe(true);
+	});
+
+	it('returns false when text/markdown has higher q than text/plain', () => {
+		expect(prefersPlainText(makeRequest({ 'Accept': 'text/markdown;q=1.0, text/plain;q=0.5' }))).toBe(false);
+	});
+
+	it('returns true when q values are equal (plain wins as fallback)', () => {
+		expect(prefersPlainText(makeRequest({ 'Accept': 'text/plain;q=0.9, text/markdown;q=0.9' }))).toBe(true);
+	});
+
+	it('returns false when only text/markdown is listed', () => {
+		expect(prefersPlainText(makeRequest({ 'Accept': 'text/markdown' }))).toBe(false);
+	});
+
+	it('returns false when Accept has no text/plain', () => {
+		expect(prefersPlainText(makeRequest({ 'Accept': 'text/markdown, text/html, */*' }))).toBe(false);
+	});
+
+	it('returns false for no Accept header', () => {
+		expect(prefersPlainText(makeRequest({}))).toBe(false);
+	});
+
+	it('returns true for Claude Code UA Accept header (text/plain;q=1.0 > text/markdown;q=0.9)', () => {
+		// simulates: Accept: text/plain;q=1.0, text/markdown;q=0.9, text/html;q=0.8, */*;q=0.1
+		expect(prefersPlainText(makeRequest({ 'Accept': 'text/plain;q=1.0, text/markdown;q=0.9, text/html;q=0.8, */*;q=0.1' }))).toBe(true);
 	});
 });
 
