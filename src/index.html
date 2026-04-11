@@ -19,10 +19,10 @@
 		<link href="/css/base.css" rel="stylesheet" />
 		<link href="/css/index.css" rel="stylesheet" />
 		<script type="module" src="ce/lunar-cal.js"></script>
-	<script type="module">
-		import { convertLunar2Solar } from './lib/amlich.js';
-		window.convertLunar2Solar = convertLunar2Solar;
-	</script>
+		<script type="module">
+			import { convertLunar2Solar } from './lib/amlich.js';
+			window.convertLunar2Solar = convertLunar2Solar;
+		</script>
 		<link
 			rel="stylesheet"
 			href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css"
@@ -67,7 +67,28 @@
 				</datalist>
 			</lunar-cal>
 		</main>
-		<hr />
+		<hr class="mx-auto max-w-3xl" />
+		<section class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-4 text-sm text-gray-700 dark:text-gray-300">
+			<h2 class="font-semibold text-2xl mb-2">Dành cho terminal &amp; AI agent</h2>
+			<p class="mb-3">
+				<strong>Cập nhật 04-2026</strong>: Mình đã thêm tính năng trả về thông tin ngày Âm dưới định dạng
+				markdown tiết kiệm token dành cho AI agents và ANSI color dành cho terminal.
+			</p>
+			<p class="mb-3">
+				Truy cập <a href="https://amlich.app">amlich.app</a> trực tiếp qua <code>curl</code>,
+				<code>wget</code> hoặc AI agent — không cần trình duyệt:
+			</p>
+			<pre
+				class="bg-gray-100 dark:bg-neutral-800 rounded-md px-4 py-3 overflow-x-auto leading-relaxed"
+			><code>curl -L amlich.app               <span class="text-gray-400"># hôm nay / today</span>
+curl -L amlich.app/2025-06-15    <span class="text-gray-400"># dương lịch / solar date</span>
+curl -L amlich.app/L2025-05-20   <span class="text-gray-400"># âm lịch / lunar date</span></code></pre>
+			<p class="mt-3">
+				AI agents (Claude, GPT, v.v.) tự động nhận kết quả dạng Markdown. Xem thêm tại
+				<a href="/llms.txt"><code>/llms.txt</code></a
+				>.
+			</p>
+		</section>
 		<footer class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
 			<p>
 				Một phiên bản hiện đại của
@@ -103,9 +124,12 @@
 						parseInt(lunarMonth),
 						parseInt(lunarYear),
 						0, // lunarLeap: 0 for non-leap month
-						7  // timeZone: Vietnam UTC+7
+						7 // timeZone: Vietnam UTC+7
 					);
-					calendar.setAttribute('initial-date', `${solarYear}-${String(solarMonth).padStart(2, '0')}-${String(solarDay).padStart(2, '0')}`);
+					calendar.setAttribute(
+						'initial-date',
+						`${solarYear}-${String(solarMonth).padStart(2, '0')}-${String(solarDay).padStart(2, '0')}`
+					);
 				}
 			}
 
@@ -144,9 +168,13 @@
 						parseInt(lunarMonth),
 						parseInt(lunarYear),
 						0, // lunarLeap: 0 for non-leap month
-						7  // timeZone: Vietnam UTC+7
+						7 // timeZone: Vietnam UTC+7
 					);
-					calendar.setSelectedDate(new Date(`${solarYear}-${String(solarMonth).padStart(2, '0')}-${String(solarDay).padStart(2, '0')}T12:00:00`));
+					calendar.setSelectedDate(
+						new Date(
+							`${solarYear}-${String(solarMonth).padStart(2, '0')}-${String(solarDay).padStart(2, '0')}T12:00:00`
+						)
+					);
 				}
 			}
 
