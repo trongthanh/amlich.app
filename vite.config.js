@@ -48,6 +48,10 @@ export default {
 		VitePWA({
 			registerType: 'autoUpdate',
 			includeAssets: ['favicon.ico', 'app-icon.svg', 'app-icon.png', 'app-icon-maskable.png'],
+			workbox: {
+				// Don't intercept navigation to static text files — let them pass through to the network
+				navigateFallbackDenylist: [/\.txt$/, /\.json$/, /\.xml$/],
+			},
 			manifest: {
 				name: 'Âm Lịch PWA',
 				short_name: 'Âm Lịch',
