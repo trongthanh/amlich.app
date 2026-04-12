@@ -26,8 +26,9 @@ const styles = css`
 		--public-holiday-color: #dc2626;
 	}
 
+	/* auto dark: only when no explicit theme attribute is set */
 	@media (prefers-color-scheme: dark) {
-		:host {
+		:host(:not([theme="light"])) {
 			--calendar-bg-color: #262829;
 			--calendar-font-color: #fff;
 			--weekdays-border-bottom-color: #404040;
@@ -46,16 +47,16 @@ const styles = css`
 			--today-event-color: #fca5a5;
 			--public-holiday-color: #dc2626;
 		}
-		.date-number.lunar-event .lunar-date {
+		:host(:not([theme="light"])) .date-number.lunar-event .lunar-date {
 			font-weight: 700;
 		}
-
-		.date-number.public-holiday .solar-date {
+		:host(:not([theme="light"])) .date-number.public-holiday .solar-date {
 			font-weight: 700;
 		}
 	}
 
-	:host-context(.dark) {
+	/* forced dark */
+	:host([theme="dark"]) {
 		--calendar-bg-color: #262829;
 		--calendar-font-color: #fff;
 		--weekdays-border-bottom-color: #404040;
@@ -74,16 +75,15 @@ const styles = css`
 		--today-event-color: #fca5a5;
 		--public-holiday-color: #dc2626;
 	}
-
-	:host-context(.dark) .date-number.lunar-event .lunar-date {
+	:host([theme="dark"]) .date-number.lunar-event .lunar-date {
+		font-weight: 700;
+	}
+	:host([theme="dark"]) .date-number.public-holiday .solar-date {
 		font-weight: 700;
 	}
 
-	:host-context(.dark) .date-number.public-holiday .solar-date {
-		font-weight: 700;
-	}
-
-	:host-context(.light) {
+	/* forced light — resets dark values when system is dark */
+	:host([theme="light"]) {
 		--calendar-bg-color: #f3f4f6;
 		--calendar-font-color: #1f2937;
 		--weekdays-border-bottom-color: #cbd5e1;
@@ -459,7 +459,7 @@ function getTimezone(timeStr) {
 }
 
 class LunisolarCalendar extends HTMLElement {
-	static observedAttributes = ['initial-date', 'timezone', 'details-visible'];
+	static observedAttributes = ['initial-date', 'timezone', 'details-visible', 'theme'];
 
 	constructor() {
 		super(); // always call super() first in the constructor.

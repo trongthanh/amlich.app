@@ -35,7 +35,7 @@
 			<span id="theme-label"></span>
 		</button>
 		<main class="container mx-auto">
-			<lunar-cal details-visible id="calendar">
+			<lunar-cal details-visible id="calendar" theme="auto">
 				<h1>Âm Lịch Việt Nam</h1>
 				<datalist slot="public-holidays">
 					<!-- additional public holidays which are not fixed and dependent on the govement's decision -->
@@ -103,6 +103,9 @@ curl -L amlich.app/L2025-05-20   <span class="text-gray-400"># âm lịch / luna
 					// auto: follow system
 					if (isDarkSystem) html.classList.add('dark');
 				}
+				// propagate theme to the web component via attribute
+				const cal = document.getElementById('calendar');
+				if (cal) cal.setAttribute('theme', pref);
 				const cfg = themeConfig[pref];
 				document.getElementById('theme-icon').textContent = cfg.icon;
 				document.getElementById('theme-label').textContent = cfg.label;
