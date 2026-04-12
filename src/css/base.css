@@ -32,6 +32,7 @@ Sections
 
 body {
 	margin: 0; /* Remove the margin in all browsers. */
+	@apply bg-white dark:bg-neutral-900 text-gray-900 dark:text-gray-100;
 }
 
 /*
@@ -58,16 +59,16 @@ Text-level semantics
 Custom: Hyper links
 */
 a {
-	@apply text-blue-600;
+	@apply text-blue-600 dark:text-blue-400;
 }
 a:visited {
-	@apply text-blue-600;
+	@apply text-blue-600 dark:text-blue-400;
 }
 a:hover {
-	@apply text-blue-400;
+	@apply text-blue-400 dark:text-blue-300;
 }
 a:active {
-	@apply text-blue-700;
+	@apply text-blue-700 dark:text-blue-500;
 }
 
 a:not([href]),

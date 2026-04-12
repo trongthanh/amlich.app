@@ -55,6 +55,54 @@ const styles = css`
 		}
 	}
 
+	:host-context(.dark) {
+		--calendar-bg-color: #262829;
+		--calendar-font-color: #fff;
+		--weekdays-border-bottom-color: #404040;
+		--calendar-date-hover-color: #505050;
+		--calendar-current-date-color: #1b1f21;
+		--calendar-today-color: #f87171;
+		--calendar-nextprev-bg-color: transparent;
+		--calendar-prevnext-date-color: #484848;
+		--calendar-arrow-color: #fff;
+		--calendar-border-radius: 16px;
+		--calendar-selected-bg-color: linear-gradient(to bottom, #03a9f4, #2196f3);
+		--calendar-active-bg-color: #505050;
+		--calendar-weekend-color: #22c55e;
+		--lunar-date-color: #facc15;
+		--lunar-date-event-color: #dc2626;
+		--today-event-color: #fca5a5;
+		--public-holiday-color: #dc2626;
+	}
+
+	:host-context(.dark) .date-number.lunar-event .lunar-date {
+		font-weight: 700;
+	}
+
+	:host-context(.dark) .date-number.public-holiday .solar-date {
+		font-weight: 700;
+	}
+
+	:host-context(.light) {
+		--calendar-bg-color: #f3f4f6;
+		--calendar-font-color: #1f2937;
+		--weekdays-border-bottom-color: #cbd5e1;
+		--calendar-date-hover-color: #9ca3af;
+		--calendar-current-date-color: #d1d5db;
+		--calendar-today-color: #dc2626;
+		--calendar-nextprev-bg-color: transparent;
+		--calendar-prevnext-date-color: #9ca3af;
+		--calendar-arrow-color: #1f2937;
+		--calendar-border-radius: 16px;
+		--calendar-selected-bg-color: linear-gradient(to bottom, #93c5fd, #60a5fa);
+		--calendar-active-bg-color: #e5e7eb;
+		--calendar-weekend-color: #15803d;
+		--lunar-date-color: #d97706;
+		--lunar-date-event-color: #dc2626;
+		--today-event-color: #991b1b;
+		--public-holiday-color: #dc2626;
+	}
+
 	* {
 		padding: 0;
 		margin: 0;

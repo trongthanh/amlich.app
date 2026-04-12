@@ -26,6 +26,14 @@
 </head>
 
 	<body>
+		<button
+			id="theme-toggle"
+			title="Chuyển đổi giao diện sáng/tối"
+			class="fixed top-3 right-3 z-50 flex items-center gap-1.5 rounded-full border border-gray-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors cursor-pointer"
+		>
+			<span id="theme-icon" aria-hidden="true"></span>
+			<span id="theme-label"></span>
+		</button>
 		<main class="container mx-auto">
 			<lunar-cal details-visible id="calendar">
 				<h1>Âm Lịch Việt Nam</h1>
@@ -39,7 +47,7 @@
 				</datalist>
 			</lunar-cal>
 		</main>
-		<hr class="mx-auto max-w-3xl" />
+		<hr class="mx-auto max-w-3xl border-gray-200 dark:border-neutral-700" />
 		<section class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-4 text-sm text-gray-700 dark:text-gray-300">
 			<h2 class="font-semibold text-2xl mb-2">Dành cho terminal &amp; AI agent</h2>
 			<p class="mb-3">
@@ -61,7 +69,7 @@ curl -L amlich.app/L2025-05-20   <span class="text-gray-400"># âm lịch / luna
 				>.
 			</p>
 		</section>
-		<footer class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+		<footer class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-600 dark:text-gray-400">
 			<p>
 				Một phiên bản hiện đại của
 				<a href="https://www.informatik.uni-leipzig.de/~duc/amlich/" rel="noopener noreferrer"
@@ -73,6 +81,48 @@ curl -L amlich.app/L2025-05-20   <span class="text-gray-400"># âm lịch / luna
 				<a href="https://github.com/trongthanh/amlich.app">code and documentation</a>. Built in Sài Gòn with ❤️.
 			</p>
 		</footer>
+		<script>
+			// Theme toggle: cycles auto → light → dark
+			const THEME_KEY = 'color-scheme';
+			const themes = ['auto', 'light', 'dark'];
+			const themeConfig = {
+				auto:  { icon: '🌗', label: 'Auto' },
+				light: { icon: '☀️', label: 'Sáng' },
+				dark:  { icon: '🌙', label: 'Tối' },
+			};
+
+			function applyTheme(pref) {
+				const html = document.documentElement;
+				const isDarkSystem = window.matchMedia('(prefers-color-scheme: dark)').matches;
+				html.classList.remove('dark', 'light');
+				if (pref === 'dark') {
+					html.classList.add('dark');
+				} else if (pref === 'light') {
+					html.classList.add('light');
+				} else {
+					// auto: follow system
+					if (isDarkSystem) html.classList.add('dark');
+				}
+				const cfg = themeConfig[pref];
+				document.getElementById('theme-icon').textContent = cfg.icon;
+				document.getElementById('theme-label').textContent = cfg.label;
+			}
+
+			let currentTheme = localStorage.getItem(THEME_KEY) || 'auto';
+			applyTheme(currentTheme);
+
+			document.getElementById('theme-toggle').addEventListener('click', () => {
+				const idx = themes.indexOf(currentTheme);
+				currentTheme = themes[(idx + 1) % themes.length];
+				localStorage.setItem(THEME_KEY, currentTheme);
+				applyTheme(currentTheme);
+			});
+
+			// Update auto mode when system preference changes
+			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+				if (currentTheme === 'auto') applyTheme('auto');
+			});
+		</script>
 		<script>
 			const calendar = document.getElementById('calendar');
 			let isInitialLoad = true;
