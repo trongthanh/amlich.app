@@ -243,7 +243,7 @@ export function renderCalendar(targetDate, useAnsi, today = getVietnamNow(), sho
 		lines.push('');
 	}
 
-	lines.push(`<${a(BOLD, 'amlich.app')} bởi ${a(BOLD, 'Thanh Trần')}>`);
+	lines.push(`{ ${a(BOLD, 'amlich.app')} bởi ${a(BOLD, 'ThanhTran.dev')} }`);
 
 	return lines.join('\n') + '\n';
 }
@@ -383,7 +383,7 @@ export function renderCalendarMarkdown(targetDate, today = getVietnamNow(), show
 	}
 
 	lines.push('');
-	lines.push('<**amlich.app** bởi **Thanh Trần**>');
+	lines.push('{ **amlich.app** bởi **ThanhTran.dev** }');
 
 	return lines.join('\n') + '\n';
 }
