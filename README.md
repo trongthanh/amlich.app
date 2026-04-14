@@ -47,7 +47,9 @@ git push origin main  # Cloudflare Pages auto-deploys; curl amlich.app works imm
 **Test live:**
 ```bash
 curl amlich.app                   # Current month + today
-curl amlich.app/2026-04-08        # Specific date
+curl amlich.app/2026-04-08        # Specific solar date
+curl amlich.app/l2026-10-03       # Specific lunar date (tháng 10, ngày 3, năm 2026)
+curl -H 'Accept: text/markdown' https://amlich.app  # Markdown output for AI agents
 wget -qO- https://amlich.app      # wget also gets ANSI colors
 ```
 

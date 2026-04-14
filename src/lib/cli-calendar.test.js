@@ -116,7 +116,13 @@ describe('renderCalendar – plain text (no ANSI)', () => {
 
 	it('always includes attribution footer', () => {
 		const out = renderCalendar(APRIL_8_2026, false, APRIL_8_2026);
-		expect(out).toContain('<amlich.app bởi Thanh Trần>');
+		expect(out).toContain('{ amlich.app bởi ThanhTran.dev }');
+	});
+
+	it('includes usage instruction line before footer', () => {
+		const out = renderCalendar(APRIL_8_2026, false, APRIL_8_2026);
+		expect(out).toContain('amlich.app/YYYY-MM-DD');
+		expect(out).toContain('amlich.app/LYYYY-MM-DD');
 	});
 
 	it('shows lunar event name on a matching lunar date (Tết Nguyên Đán)', () => {
@@ -170,14 +176,14 @@ describe('renderCalendar – ANSI mode', () => {
 	it('attribution footer is present in ANSI mode', () => {
 		const out = renderCalendar(APRIL_8_2026, true, APRIL_8_2026);
 		expect(out).toContain('amlich.app');
-		expect(out).toContain('Thanh Trần');
+		expect(out).toContain('ThanhTran.dev');
 	});
 });
 
 describe('renderCalendarMarkdown', () => {
-	it('contains markdown h1 header right above the grid', () => {
+	it('contains month/year title as heading level 2', () => {
 		const out = renderCalendarMarkdown(APRIL_8_2026);
-		expect(out).toContain('# Tháng 4 2026');
+		expect(out).toContain('## Tháng 4 2026');
 	});
 
 	it('shows (Hôm Nay) label when target is today', () => {
@@ -226,10 +232,10 @@ describe('renderCalendarMarkdown', () => {
 		expect(out).toContain('Tý (23-1)');
 	});
 
-	it('grid is rendered as a markdown table (no code fence)', () => {
+	it('grid is rendered as plain text inside a code fence', () => {
 		const out = renderCalendarMarkdown(APRIL_8_2026);
-		expect(out).not.toContain('```');
-		expect(out).toContain('| ------');
+		expect(out).toContain('```');
+		expect(out).not.toContain('| ------');
 	});
 
 	it('highlights target date as [day] in the code block', () => {
@@ -269,9 +275,10 @@ describe('renderCalendarMarkdown', () => {
 		expect(out).not.toContain('Hôm nay:');
 	});
 
-	it('footer is shown below the table when showFooter=true', () => {
+	it('footer is shown below the grid when showFooter=true', () => {
 		const out = renderCalendarMarkdown(APRIL_8_2026, APRIL_8_2026, true);
-		expect(out).toContain('Hôm nay: Thứ Tư, 8 Tháng 4 2026');
+		expect(out).toContain('**Hôm nay**:');
+		expect(out).toContain('Thứ Tư, 8 Tháng 4 2026');
 	});
 
 	it('does NOT contain ANSI escape codes', () => {
@@ -287,12 +294,18 @@ describe('renderCalendarMarkdown', () => {
 
 	it('always includes attribution footer', () => {
 		const out = renderCalendarMarkdown(APRIL_8_2026);
-		expect(out).toContain('<**amlich.app** bởi **Thanh Trần**>');
+		expect(out).toContain('{ amlich.app bởi ThanhTran.dev }');
 	});
 
-	it('shows lunar event in bold on a matching lunar date (Tết Nguyên Đán)', () => {
+	it('includes usage instruction line before footer', () => {
+		const out = renderCalendarMarkdown(APRIL_8_2026);
+		expect(out).toContain('amlich.app/YYYY-MM-DD');
+		expect(out).toContain('amlich.app/LYYYY-MM-DD');
+	});
+
+	it('shows lunar event on a matching lunar date (Tết Nguyên Đán)', () => {
 		const out = renderCalendarMarkdown(FEB_17_2026);
-		expect(out).toContain('**🎊 Tết Nguyên Đán**');
+		expect(out).toContain('🎊 Tết Nguyên Đán');
 	});
 
 	it('does not show a lunar event on a non-event date', () => {
@@ -301,9 +314,9 @@ describe('renderCalendarMarkdown', () => {
 		expect(out).not.toContain('Tết Nguyên Đán');
 	});
 
-	it('week rows are separated by blank lines in the table output', () => {
+	it('week rows are separated by blank lines in the grid', () => {
 		const out = renderCalendarMarkdown(APRIL_8_2026);
-		// lunar row ends with |, blank line, next solar row starts with |
-		expect(out).toMatch(/\|\n\n\|/);
+		// each pair of solar+lunar rows is followed by a blank line
+		expect(out).toMatch(/\d\n\n +\d/);
 	});
 });

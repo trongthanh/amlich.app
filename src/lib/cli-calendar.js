@@ -243,6 +243,7 @@ export function renderCalendar(targetDate, useAnsi, today = getVietnamNow(), sho
 		lines.push('');
 	}
 
+	lines.push(a(DIM, `{ Tra dương lịch: amlich.app/YYYY-MM-DD · Tra âm lịch: amlich.app/LYYYY-MM-DD }`));
 	lines.push(`{ ${a(BOLD, 'amlich.app')} bởi ${a(BOLD, 'ThanhTran.dev')} }`);
 
 	return lines.join('\n') + '\n';
@@ -281,23 +282,21 @@ export function renderCalendarMarkdown(targetDate, today = getVietnamNow(), show
 	lines.push(`# 📅 ${dayName}, ${day} Tháng ${month} ${year} ${todayLabel}`);
 	lines.push(`**Âm Lịch:** ${lunarInfo.date} ${lunarInfo.monthName}, Năm ${lunarInfo.year}`);
 	const lunarEvent = LUNAR_EVENTS[`${lunarInfo.date}/${lunarInfo.month}`];
-	lines.push(lunarEvent ? `**${lunarEvent}**` : '');
+	lines.push(lunarEvent ? `${lunarEvent}` : '');
 	lines.push(tietkhiLine);
 	lines.push(`Tháng ${lunarInfo.ccmonth} · Ngày ${lunarInfo.ccdate} · Giờ ${lunarInfo.cchour}`);
-	lines.push(`**Giờ hoàng đạo:** ${hoangDao}`);
+	lines.push(`Giờ hoàng đạo: ${hoangDao}`);
 	lines.push('');
 
-	// ── Month title right above grid ─────────────────────────────────────────
-	lines.push(`## Tháng ${month} ${year}`);
-	lines.push('');
-
-	// ── Calendar as aligned markdown table (padStart columns for code-editor) ─
-	// Each cell value is padStart(COL_W) so columns line up in raw/monospace text.
+	// ── Calendar as plain text grid in code fence ────────────────────────────
 	const WEEK_COLS = ['Hai', 'Ba', 'Tư', 'Năm', 'Sáu', 'Bảy', 'CN'];
-	const row2md = (cells) => `| ${cells.join(' | ')} |`;
 
-	lines.push(row2md(WEEK_COLS.map((d) => d.padStart(COL_W))));
-	lines.push(row2md(Array(7).fill('------')));
+	const title = `## Tháng ${month} ${year}`;
+	lines.push(title);
+	lines.push('');
+	lines.push('```');
+	lines.push(WEEK_COLS.map((d) => d.padStart(COL_W)).join(''));
+	lines.push('─'.repeat(GRID_W));
 
 	// Build calendar cells
 	const firstDow = new Date(year, month - 1, 1).getDay();
@@ -349,41 +348,45 @@ export function renderCalendarMarkdown(targetDate, today = getVietnamNow(), show
 
 		// Solar row: target=[day], today=(day), others plain number — all padStart(COL_W)
 		lines.push(
-			row2md(
-				row.map((cell) => {
+			row
+				.map((cell) => {
 					if (cell.isTarget) return `[${cell.sd}]`.padStart(COL_W);
 					if (cell.isTodayCell) return `(${cell.sd})`.padStart(COL_W);
 					return String(cell.sd).padStart(COL_W);
 				})
-			)
+				.join('')
 		);
 
 		// Lunar row
 		lines.push(
-			row2md(
-				row.map((cell, j) => {
+			row
+				.map((cell, j) => {
 					const cellIdx = r * 7 + j;
 					const showMonth = cell.ld === 1 || cellIdx === 0 || cellIdx === lastCellIdx;
 					const base = showMonth ? `${cell.ld}/${cell.lm}` : String(cell.ld);
 					return (cell.ld === 15 ? `🌕${base}` : base).padStart(COL_W);
 				})
-			)
+				.join('')
 		);
 		lines.push('');
 	}
 
-	// Footer below the table
+	lines.push('```');
+	lines.push('');
+
+	// Footer below the grid
 	if (showFooter) {
 		const todayDate = new Date(todayY, todayM - 1, todayD);
 		const todayLunar = getLunarDayInfo(todayDate, 7);
 		lines.push('');
 		lines.push(
-			`_Hôm nay: ${WEEK_DAYS_FULL[todayDow]}, ${todayD} Tháng ${todayM} ${todayY} (${todayLunar.date} ${todayLunar.monthName}, Năm ${todayLunar.year})_`
+			`**Hôm nay**: ${WEEK_DAYS_FULL[todayDow]}, ${todayD} Tháng ${todayM} ${todayY} (${todayLunar.date} ${todayLunar.monthName}, Năm ${todayLunar.year})`
 		);
 	}
 
 	lines.push('');
-	lines.push('{ **amlich.app** bởi **ThanhTran.dev** }');
+	lines.push(`{ Tra dương lịch: amlich.app/YYYY-MM-DD · Tra âm lịch: amlich.app/LYYYY-MM-DD }`);
+	lines.push('{ amlich.app bởi ThanhTran.dev }');
 
 	return lines.join('\n') + '\n';
 }
