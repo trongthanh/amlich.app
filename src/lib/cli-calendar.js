@@ -288,15 +288,14 @@ export function renderCalendarMarkdown(targetDate, today = getVietnamNow(), show
 	lines.push(`Giờ hoàng đạo: ${hoangDao}`);
 	lines.push('');
 
-	// ── Calendar as plain text grid in code fence ────────────────────────────
+	// ── Calendar as aligned markdown table ───────────────────────────────────
 	const WEEK_COLS = ['Hai', 'Ba', 'Tư', 'Năm', 'Sáu', 'Bảy', 'CN'];
+	const row2md = (cells) => `| ${cells.join(' | ')} |`;
 
-	const title = `## Tháng ${month} ${year}`;
-	lines.push(title);
+	lines.push(`## Tháng ${month} ${year}`);
 	lines.push('');
-	lines.push('```');
-	lines.push(WEEK_COLS.map((d) => d.padStart(COL_W)).join(''));
-	lines.push('─'.repeat(GRID_W));
+	lines.push(row2md(['  ', ...WEEK_COLS.map((d) => d.padStart(COL_W))]));
+	lines.push(row2md(['--', ...Array(7).fill('------')]));
 
 	// Build calendar cells
 	const firstDow = new Date(year, month - 1, 1).getDay();
@@ -348,33 +347,31 @@ export function renderCalendarMarkdown(targetDate, today = getVietnamNow(), show
 
 		// Solar row: target=[day], today=(day), others plain number — all padStart(COL_W)
 		lines.push(
-			row
-				.map((cell) => {
+			row2md([
+				'  ',
+				...row.map((cell) => {
 					if (cell.isTarget) return `[${cell.sd}]`.padStart(COL_W);
 					if (cell.isTodayCell) return `(${cell.sd})`.padStart(COL_W);
 					return String(cell.sd).padStart(COL_W);
-				})
-				.join('')
+				}),
+			])
 		);
 
 		// Lunar row
 		lines.push(
-			row
-				.map((cell, j) => {
+			row2md([
+				'AL',
+				...row.map((cell, j) => {
 					const cellIdx = r * 7 + j;
 					const showMonth = cell.ld === 1 || cellIdx === 0 || cellIdx === lastCellIdx;
 					const base = showMonth ? `${cell.ld}/${cell.lm}` : String(cell.ld);
 					return (cell.ld === 15 ? `🌕${base}` : base).padStart(COL_W);
-				})
-				.join('')
+				}),
+			])
 		);
-		lines.push('');
 	}
 
-	lines.push('```');
-	lines.push('');
-
-	// Footer below the grid
+	// Footer below the table
 	if (showFooter) {
 		const todayDate = new Date(todayY, todayM - 1, todayD);
 		const todayLunar = getLunarDayInfo(todayDate, 7);

@@ -232,10 +232,10 @@ describe('renderCalendarMarkdown', () => {
 		expect(out).toContain('Tý (23-1)');
 	});
 
-	it('grid is rendered as plain text inside a code fence', () => {
+	it('grid is rendered as a markdown table (no code fence)', () => {
 		const out = renderCalendarMarkdown(APRIL_8_2026);
-		expect(out).toContain('```');
-		expect(out).not.toContain('| ------');
+		expect(out).not.toContain('```');
+		expect(out).toContain('| ------');
 	});
 
 	it('highlights target date as [day] in the code block', () => {
@@ -314,9 +314,10 @@ describe('renderCalendarMarkdown', () => {
 		expect(out).not.toContain('Tết Nguyên Đán');
 	});
 
-	it('week rows are separated by blank lines in the grid', () => {
+	it('table rows are continuous with no blank lines between them', () => {
 		const out = renderCalendarMarkdown(APRIL_8_2026);
-		// each pair of solar+lunar rows is followed by a blank line
-		expect(out).toMatch(/\d\n\n +\d/);
+		// rows are directly adjacent — no blank line between lunar and next solar row
+		expect(out).not.toMatch(/\|\n\n\|/);
+		expect(out).toMatch(/\|\n\|/);
 	});
 });
