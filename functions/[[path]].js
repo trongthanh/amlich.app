@@ -112,8 +112,8 @@ export async function onRequest(context) {
 		if (!isNaN(parsed)) {
 			targetDate = parsed;
 		} else {
-			// Try lunar date format: lYYYY-MM-DD or LYYYY-MM-DD
-			const lunarMatch = /^[lL](\d{4})-(\d{2})-(\d{2})$/.exec(pathStr);
+			// Try lunar date format: lYYYY-MM-DD or LYYYY-MM-DD (dashes or slashes, 1-2 digit month/day)
+			const lunarMatch = /^[lL](\d{4})[/\-](\d{1,2})[/\-](\d{1,2})$/.exec(pathStr);
 			if (lunarMatch) {
 				const [, lunarYear, lunarMonth, lunarDay] = lunarMatch;
 				const [solarDay, solarMonth, solarYear] = convertLunar2Solar(
